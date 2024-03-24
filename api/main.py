@@ -11,7 +11,7 @@ load_dotenv()
 
 api_key = os.environ['MISTRAL_API_KEY']
 
-model = "mistral-small-latest"
+model = "mistral-large-latest"
 client = MistralClient(api_key=api_key)
 
 app = FastAPI()
@@ -51,6 +51,7 @@ class InvocationRequest(BaseModel):
 async def root(request: InvocationRequest):
 
     messages = [
+        ChatMessage(role="system", content="Be sure to be succinct in all your responses."),
         ChatMessage(role="system", content=request.global_story),
         ChatMessage(role="system", content=request.actor.prompt())
     ]

@@ -1,5 +1,5 @@
 import React from "react";
-import { AppShell, Grid } from "@mantine/core";
+import { AppShell, Grid, Textarea, Title } from "@mantine/core";
 import Header from "../components/Header";
 import Actors from "../components/Actors";
 import { useDisclosure } from "@mantine/hooks";
@@ -26,13 +26,21 @@ export default function Home() {
       padding="md"
     >
       <AppShell.Header>
-        <Header />f
+        <Header />
       </AppShell.Header>
       <AppShell.Navbar>
         <ActorSidebar currentActor={currActor} setCurrentActor={setCurrActor} />
       </AppShell.Navbar>
       <AppShell.Main>
-        <ActorChat actor={actors[currActor]} />
+        <Grid>
+          <Grid.Col span={9}>
+            <ActorChat actor={actors[currActor]} />
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Title order={3}>Your notes</Title>
+            <Textarea></Textarea>
+          </Grid.Col>
+        </Grid>
       </AppShell.Main>
     </AppShell>
   );
