@@ -11,10 +11,9 @@ export interface Actor {
   name: string;
   messages: LLMMessage[];
 }
-
 export const [MysteryProvider, useMysteryContext] = constate(() => {
   const [globalStory, setGlobalStory] = useState("");
-  const [actors, setActors] = useState<Actor[]>([]);
+  const [actors, setActors] = useState<{ [id: number]: Actor }>({});
 
   return {
     globalStory,

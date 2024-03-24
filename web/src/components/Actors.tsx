@@ -9,9 +9,9 @@ export default function Actors() {
   return (
     <Stack>
       <Grid>
-        <Title order={3}>{actors.length} Actors</Title>
+        <Title order={3}>{Object.values(actors).length} Actors</Title>
         <Group>
-          {actors.map((a, i) => {
+          {Object.values(actors).map((a, i) => {
             console.log("rendering actor ", a);
             return <ActorChat actor={a} key={i} />;
           })}
@@ -19,11 +19,16 @@ export default function Actors() {
 
         <Button
           onClick={() => {
-            const actorId = actors.length + 1;
-            setActors([
+            const actorId = Object.values(actors).length + 1;
+
+            setActors({
               ...actors,
-              { id: actorId, name: `Actor ${actorId}`, messages: [] },
-            ]);
+              [actorId]: {
+                id: actorId,
+                name: `Actor ${actorId}`,
+                messages: [],
+              },
+            });
           }}
         >
           Add Actor

@@ -18,9 +18,11 @@ export default function ActorChat({ actor }: Props) {
 
   const setActor = (a: Partial<Actor>) => {
     setActors((all) => {
-      const newActors = [...all];
-      const index = newActors.findIndex((actor) => actor.id === a.id);
-      newActors[index] = { ...newActors[index], ...a };
+      const newActors = { ...all };
+      newActors[actor.id] = {
+        ...newActors[actor.id],
+        ...a,
+      };
       return newActors;
     });
   };
