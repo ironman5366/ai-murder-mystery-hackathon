@@ -6,6 +6,7 @@ import {
 } from "../providers/mysteryContext";
 import { Button, Group, Stack, TextInput } from "@mantine/core";
 import invokeAI from "../api/invoke";
+import ActorImage from "./ActorImage";
 
 interface Props {
   actor: Actor;
@@ -63,6 +64,7 @@ export default function ActorChat({ actor }: Props) {
         overflow: "scroll",
       }}
     >
+      <ActorImage actor={actor} />
       <TextInput
         onChange={(event) => {
           setActor({

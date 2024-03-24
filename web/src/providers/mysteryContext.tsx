@@ -12,16 +12,20 @@ export interface Actor {
   name: string;
   bio: string;
   secret: string;
+  image: string;
   messages: LLMMessage[];
 }
 
-const INITIAL_CHARACTERS = Story.characters.map(({ name, bio, secret }, i) => ({
-  id: i,
-  name,
-  bio,
-  secret,
-  messages: [],
-}));
+const INITIAL_CHARACTERS = Story.characters.map(
+  ({ name, bio, secret, image }, i) => ({
+    id: i,
+    name,
+    bio,
+    secret,
+    image,
+    messages: [],
+  }),
+);
 
 let INITIAL_CHARACTERS_BY_ID: { [id: number]: Actor } = {};
 
