@@ -32,10 +32,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
-
-
 class LLMMessage(BaseModel):
     role: str
     content: str

@@ -56,6 +56,8 @@ export default function ActorChat({ actor }: Props) {
       style={{
         border: "1px solid black",
         padding: 10,
+        maxHeight: 300,
+        overflow: "scroll",
       }}
     >
       <TextInput
