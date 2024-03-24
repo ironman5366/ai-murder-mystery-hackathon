@@ -93,6 +93,7 @@ async def root(request: InvocationRequest):
     """
 
     critique_messages = [
+
         ChatMessage(role="system", content=critique_prompt),
         ChatMessage(role="user", content=unrefined_output)
     ]
