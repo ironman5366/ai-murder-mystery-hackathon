@@ -35,11 +35,14 @@ export default function ActorChat({ actor }: Props) {
       });
       invokeAI({
         globalStory,
-        messages,
+        actor: {
+          ...actor,
+          messages,
+        },
       }).then((data) => {
         setActor({
           messages: [
-            ...actor.messages,
+            ...messages,
             {
               role: "assistant",
               content: data.response,
@@ -68,6 +71,7 @@ export default function ActorChat({ actor }: Props) {
         }}
         value={actor.name}
       />
+      <div>{actor.bio}</div>
       {actor.messages.map((m) => (
         <div
           style={{
