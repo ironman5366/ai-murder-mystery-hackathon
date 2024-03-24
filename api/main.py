@@ -47,16 +47,15 @@ class InvocationRequest(BaseModel):
     global_story: str
     actor: Actor
 
-
 @app.post("/invoke")
 async def root(request: InvocationRequest):
 
     messages = [
         ChatMessage(role="system", content=request.global_story),
-        ChatMessage(role=request.actor.prompt())
+        ChatMessage(role="system", content=request.actor.prompt())
     ]
 
-    for message in request.messages:
+    for message in request.actor.messages:
         messages.append(
             ChatMessage(
                 role=message.role,
