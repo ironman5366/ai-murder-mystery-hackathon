@@ -1,10 +1,15 @@
 import React from "react";
 import {useMysteryContext} from "../providers/mysteryContext";
-import {Textarea} from "@mantine/core";
+import {Stack, Textarea, Title} from "@mantine/core";
 
 
 export default function GlobalStory() {
     const { globalStory, setGlobalStory } = useMysteryContext()
 
-    return <Textarea value={globalStory} onChange={(event) => setGlobalStory(event.currentTarget.value)} />
+    return <Stack>
+        <Title order={2}>
+            Global Story
+        </Title>
+        <Textarea value={globalStory} onChange={(event) => setGlobalStory(event.currentTarget.value)} />
+    </Stack>
 }

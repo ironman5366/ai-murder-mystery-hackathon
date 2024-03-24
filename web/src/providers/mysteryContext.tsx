@@ -1,9 +1,14 @@
 import constate from "constate";
 import {useState} from "react";
 
-interface Actor {
+export interface LLMMessage {
+    role: "user" | "assistant",
+    content: string
+}
+
+export interface Actor {
     name: string;
-    context: string
+    messages: LLMMessage[]
 }
 
 

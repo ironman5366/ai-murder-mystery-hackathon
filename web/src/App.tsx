@@ -1,21 +1,12 @@
-import React from 'react';
-import './App.css';
-import {Grid} from "@mantine/core";
-import GlobalStory from "./components/GloablStory";
+import React from "react";
+import {Container, MantineProvider} from "@mantine/core";
+import Home from "./pages/Home";
 
-function App() {
-  return (
-      <>
-          <Grid>
-              <Grid.Col span={3}>
-                  <GlobalStory />
-              </Grid.Col>
-              <Grid.Col span={9}>
+export default function App() {
+    return <MantineProvider>
+        <Container>
+            <Home />
+        </Container>
+    </MantineProvider>
 
-              </Grid.Col>
-          </Grid>
-      </>
-  );
 }
-
-export default App;
