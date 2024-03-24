@@ -5,8 +5,8 @@ import ActorImage from "./ActorImage";
 
 interface Props {
   actor: Actor;
-  currentActor: Actor;
-  setCurrentActor: (actor: Actor) => void;
+  currentActor: number;
+  setCurrentActor: (actor: number) => void;
 }
 
 export default function SidebarAvatar({
@@ -14,15 +14,15 @@ export default function SidebarAvatar({
   currentActor,
   setCurrentActor,
 }: Props) {
-  const active = actor.id === currentActor.id;
+  const active = actor.id === currentActor;
 
   return (
     <Group
       onClick={() => {
-        setCurrentActor(actor);
+        setCurrentActor(actor.id);
       }}
       style={{
-        cursor: "hover",
+        cursor: "pointer",
         backgroundColor: active ? "lightblue" : "transparent",
       }}
     >

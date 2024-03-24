@@ -4,7 +4,7 @@ import {
   LLMMessage,
   useMysteryContext,
 } from "../providers/mysteryContext";
-import { Button, Group, Stack, TextInput } from "@mantine/core";
+import { Button, Group, Loader, Stack, Text, TextInput } from "@mantine/core";
 import invokeAI from "../api/invoke";
 import ActorImage from "./ActorImage";
 
@@ -60,37 +60,41 @@ export default function ActorChat({ actor }: Props) {
       style={{
         border: "1px solid black",
         padding: 10,
-        maxHeight: 300,
         overflow: "scroll",
       }}
     >
       <ActorImage actor={actor} />
-      <TextInput
-        onChange={(event) => {
-          setActor({
-            name: event.currentTarget.value,
-          });
+      <Text
+        style={{
+          fontWeight: "bold",
         }}
-        value={actor.name}
-      />
+      >
+        {actor.name}
+      </Text>
       <div>{actor.bio}</div>
-      {actor.messages.map((m) => (
+      {actor.messages.map((m, i) => (
         <div
+          key={i}
           style={{
             border: "1px dotted black",
           }}
         >
-          {m.role}: {m.content}
+          {m.role === "user" ? "You" : actor.name}: {m.content}
         </div>
       ))}
       <Group>
-        <TextInput
-          placeholder={`Talk to ${actor.name}`}
-          onChange={(event) => {
-            setCurrMessage(event.currentTarget.value);
-          }}
-          value={currMessage}
-        />
+        {loading ? (
+          <Loader />
+        ) : (
+          <TextInput
+            placeholder={`Talk to ${actor.name}`}
+            onChange={(event) => {
+              setCurrMessage(event.currentTarget.value);
+            }}
+            value={currMessage}
+          />
+        )}
+
         <Button
           disabled={loading}
           onClick={() => {

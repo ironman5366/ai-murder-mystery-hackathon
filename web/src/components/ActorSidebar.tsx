@@ -4,8 +4,8 @@ import { Stack } from "@mantine/core";
 import SidebarAvatar from "./SidebarAvatar";
 
 interface Props {
-  currentActor: Actor;
-  setCurrentActor: (actor: Actor) => void;
+  currentActor: number;
+  setCurrentActor: (actor: number) => void;
 }
 
 export default function ActorSidebar(props: Props) {
