@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from mistralai.client import MistralClient
 from mistralai.models.chat_completion import ChatMessage
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -14,6 +15,19 @@ model = "mistral-medium-latest"
 client = MistralClient(api_key=api_key)
 
 app = FastAPI()
+
+
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 
