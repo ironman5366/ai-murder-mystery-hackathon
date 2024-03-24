@@ -1,9 +1,9 @@
-import { LLMMessage } from "../providers/mysteryContext";
+import { Actor } from "../providers/mysteryContext";
 import { API_URL } from "../constants";
 
 export interface InvokeParams {
   globalStory: string;
-  messages: LLMMessage[];
+  actor: Actor;
 }
 
 export interface InvokeResponse {
@@ -12,13 +12,13 @@ export interface InvokeResponse {
 
 export default async function invokeAI({
   globalStory,
-  messages,
+  actor,
 }: InvokeParams): Promise<InvokeResponse> {
   const resp = await fetch(`${API_URL}/invoke/`, {
     method: "POST",
     body: JSON.stringify({
       global_story: globalStory,
-      messages,
+      actor,
     }),
     headers: {
       "Content-Type": "application/json",

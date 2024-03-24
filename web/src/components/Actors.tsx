@@ -1,38 +1,24 @@
 import React from "react";
 import { useMysteryContext } from "../providers/mysteryContext";
-import { Button, Grid, Group, Stack, Title } from "@mantine/core";
+import { Grid, Stack, Title } from "@mantine/core";
 import ActorChat from "./Actor";
 
 export default function Actors() {
-  const { actors, setActors } = useMysteryContext();
+  const { actors } = useMysteryContext();
 
   return (
     <Stack>
       <Grid>
         <Title order={3}>{Object.values(actors).length} Actors</Title>
-        <Group>
+        <Grid>
           {Object.values(actors).map((a, i) => {
-            console.log("rendering actor ", a);
-            return <ActorChat actor={a} key={i} />;
+            return (
+              <Grid.Col span={3}>
+                <ActorChat actor={a} key={i} />
+              </Grid.Col>
+            );
           })}
-        </Group>
-
-        <Button
-          onClick={() => {
-            const actorId = Object.values(actors).length + 1;
-
-            setActors({
-              ...actors,
-              [actorId]: {
-                id: actorId,
-                name: `Actor ${actorId}`,
-                messages: [],
-              },
-            });
-          }}
-        >
-          Add Actor
-        </Button>
+        </Grid>
       </Grid>
     </Stack>
   );

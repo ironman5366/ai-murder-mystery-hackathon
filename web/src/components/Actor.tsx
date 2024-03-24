@@ -35,11 +35,14 @@ export default function ActorChat({ actor }: Props) {
       });
       invokeAI({
         globalStory,
-        messages,
+        actor: {
+          ...actor,
+          messages,
+        },
       }).then((data) => {
         setActor({
           messages: [
-            ...actor.messages,
+            ...messages,
             {
               role: "assistant",
               content: data.response,
@@ -56,6 +59,8 @@ export default function ActorChat({ actor }: Props) {
       style={{
         border: "1px solid black",
         padding: 10,
+        maxHeight: 300,
+        overflow: "scroll",
       }}
     >
       <TextInput
@@ -66,6 +71,7 @@ export default function ActorChat({ actor }: Props) {
         }}
         value={actor.name}
       />
+      <div>{actor.bio}</div>
       {actor.messages.map((m) => (
         <div
           style={{
