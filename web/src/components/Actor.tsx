@@ -1,6 +1,11 @@
-import React from "react";
-import { Actor, useMysteryContext } from "../providers/mysteryContext";
+import React, { useState } from "react";
+import {
+  Actor,
+  LLMMessage,
+  useMysteryContext,
+} from "../providers/mysteryContext";
 import { Button, Group, Stack, TextInput } from "@mantine/core";
+import invokeAI from "../api/invoke";
 
 interface Props {
   actor: Actor;
@@ -8,7 +13,8 @@ interface Props {
 
 export default function ActorChat({ actor }: Props) {
   const [currMessage, setCurrMessage] = React.useState("");
-  const { setActors } = useMysteryContext();
+  const { setActors, globalStory } = useMysteryContext();
+  const [loading, setLoading] = useState(false);
 
   const setActor = (a: Partial<Actor>) => {
     setActors((all) => {
@@ -17,6 +23,30 @@ export default function ActorChat({ actor }: Props) {
       newActors[index] = { ...newActors[index], ...a };
       return newActors;
     });
+  };
+
+  const sendChat = (messages: LLMMessage[]) => {
+    if (!loading) {
+      setLoading(true);
+      setActor({
+        messages,
+      });
+      invokeAI({
+        globalStory,
+        messages,
+      }).then((data) => {
+        setActor({
+          messages: [
+            ...actor.messages,
+            {
+              role: "assistant",
+              content: data.response,
+            },
+          ],
+        });
+        setLoading(false);
+      });
+    }
   };
 
   return (
@@ -52,17 +82,16 @@ export default function ActorChat({ actor }: Props) {
           value={currMessage}
         />
         <Button
+          disabled={loading}
           onClick={() => {
-            // TODO: actually do the inference lol
-            setActor({
-              messages: [
-                ...actor.messages,
-                {
-                  role: "user",
-                  content: currMessage,
-                },
-              ],
-            });
+            sendChat([
+              ...actor.messages,
+              {
+                role: "user",
+                content: currMessage,
+              },
+            ]);
+
             setCurrMessage("");
           }}
         >
