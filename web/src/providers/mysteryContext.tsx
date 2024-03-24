@@ -27,7 +27,7 @@ const INITIAL_CHARACTERS = Story.characters.map(
   }),
 );
 
-let INITIAL_CHARACTERS_BY_ID: { [id: number]: Actor } = {};
+export let INITIAL_CHARACTERS_BY_ID: { [id: number]: Actor } = {};
 
 INITIAL_CHARACTERS.forEach((c) => {
   INITIAL_CHARACTERS_BY_ID[c.id] = c;

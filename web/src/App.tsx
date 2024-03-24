@@ -7,9 +7,7 @@ export default function App() {
   return (
     <MantineProvider>
       <MysteryProvider>
-        <Container size="90%">
-          <Home />
-        </Container>
+        <Home />
       </MysteryProvider>
     </MantineProvider>
   );
