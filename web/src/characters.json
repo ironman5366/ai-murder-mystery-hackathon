@@ -4,27 +4,32 @@
         {
             "name": "Violent Jang",
             "bio": "36 year old, cabin owner and organizer of the Cabin Hunting competition. Inherited the mountain cabin from his father. Married to Pretty Park 3 months ago. Has a history of anger issues, especially related to the competition. Was alone in his room at the time of the victim's death.",
-            "secret": "Wanted to have Victim George stuck in a pit during the competition to make him lose. Has a bloody gash on his arm from a fall during the competition."
+            "secret": "Wanted to have Victim George stuck in a pit during the competition to make him lose. Has a bloody gash on his arm from a fall during the competition.",
+            "image": "violent.png"
         },
         {
             "name": "Pretty Park",
             "bio": "27 year old, wife to Violent Jang. Was out for a walk at the time of the death and got lost in the rain. Constantly complains about her skin getting dry and has blood gashes on her arm from a fall on the first day.",
-            "secret": "Gave Victim George her wedding ring as collateral until he kills Violent Jang for $100K. Found the Note about George and Violent Jang meeting up at night and thought the meeting was to expose her."
+            "secret": "Gave Victim George her wedding ring as collateral until he kills Violent Jang for $100K. Found the Note about George and Violent Jang meeting up at night and thought the meeting was to expose her.",
+            "image": "pretty.png"
         },
         {
             "name": "Solitary Ha",
             "bio": "37 year old professional hunter and the only professional hunter in the competition. Used to be a professional soldier and a shooting instructor. Attended the first 2 competitions and was outside at the time of death.",
-            "secret": "Hiding the key to the well padlock in her pocket. Missing Na was her hunting partner who she accidentally killed from a hunting fire gone wrong. She hid the body in the well."
+            "secret": "Hiding the key to the well padlock in her pocket. Missing Na was her hunting partner who she accidentally killed from a hunting fire gone wrong. She hid the body in the well.",
+            "image": "solitary.png"
         },
         {
             "name": "Amateur Jim",
             "bio": "35 year old businessman running a black market detective agency. First time meeting George and was in bed at the time of death. Claims to be allergic to everything, even dirt.",
-            "secret": "Stole a gun just so he could enter the competition. Saw Victim George stuck in a pit on the second day of competition and helped him out. Hiding a blue jewel necklace under his hunting cap."
+            "secret": "Stole a gun just so he could enter the competition. Saw Victim George stuck in a pit on the second day of competition and helped him out. Hiding a blue jewel necklace under his hunting cap.",
+            "image": "amateur.png"
         },
         {
             "name": "Innocent Kim",
             "bio": "29 year old employee at No Zam Pulp. Carries around a body pillow waifu named Sakarin-chan. First hunting competition and tried to leave home but was stopped by Solitary Ha.",
-            "secret": "Forged notes to set up a meeting between Victim George and others, and stole the $20K prize money from the competition."
+            "secret": "Forged notes to set up a meeting between Victim George and others, and stole the $20K prize money from the competition.",
+            "image": "innocent.png"
         }
     ]
 }
