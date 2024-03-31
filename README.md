@@ -13,12 +13,18 @@ cd ai-murder-mystery-hackathon
 ```
 bash setup.sh
 ```
-3. Start up the api
+3. Add your Anthropic API to web/.env file
+```
+nano web/.env
+export ANTHROPIC_API_KEY="YOUR_API_KEY_HERE"
+(<ctrl+x , y, enter> to save changes and exit nano)
+```
+4. Start up the api
 ```
 bash api_start.sh
 ```
-4. In separate terminal, start up the web interface
+5. In separate terminal, start up the web interface
 ```
 bash web_start.sh
 ```
-5. Play the game
+6. Play the game
