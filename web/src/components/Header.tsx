@@ -18,8 +18,8 @@ export default function Header() {
           }}
         />
         <Stack>
-          <Title>Clue-Bot</Title>
-          <Title order={3}>Intrigue is all you need</Title>
+          <Title>AI Alibis</Title>
+          <Title order={3}>Multi-Agent LLM Murder Mystery</Title>
         </Stack>
       </Group>
     </Center>

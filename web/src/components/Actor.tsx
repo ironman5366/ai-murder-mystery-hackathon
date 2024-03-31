@@ -14,7 +14,7 @@ interface Props {
 
 export default function ActorChat({ actor }: Props) {
   const [currMessage, setCurrMessage] = React.useState("");
-  const { setActors, globalStory } = useMysteryContext();
+  const { setActors, globalStory} = useMysteryContext();
   const [loading, setLoading] = useState(false);
 
   const setActor = (a: Partial<Actor>) => {

@@ -11,17 +11,23 @@ export interface Actor {
   id: number;
   name: string;
   bio: string;
+  personality: string;
+  context: string;
   secret: string;
+  violation: string;
   image: string;
   messages: LLMMessage[];
 }
 
 const INITIAL_CHARACTERS = Story.characters.map(
-  ({ name, bio, secret, image }, i) => ({
+  ({ name, bio, personality, context, secret, violation, image }, i) => ({
     id: i,
     name,
     bio,
+    personality,
+    context,
     secret,
+    violation,
     image,
     messages: [],
   }),
