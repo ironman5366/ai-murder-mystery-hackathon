@@ -33,27 +33,34 @@ def invoke_ai(conn,
         start_time = datetime.now(tz=timezone.utc)
         serialized_messages = [msg.model_dump() for msg in messages]
 
-        response = anthropic.Anthropic().messages.create(
+        anthropic_response = anthropic.Anthropic().messages.create(
             model=MODEL,
             system=system_prompt,
             messages=serialized_messages,
             max_tokens=MAX_TOKENS,
-        ).content[0].text
+        )
+
+        input_tokens = anthropic_response.usage.input_tokens
+        output_tokens = anthropic_response.usage.output_tokens
+        total_tokens = input_tokens + output_tokens
+
+        text_response = anthropic_response.content[0].text
 
         finish_time = datetime.now(tz=timezone.utc)
 
         cur.execute(
-            "INSERT INTO ai_invocations(conversation_turn_id, prompt_role, model, model_key, prompt_messages, response, started_at, finished_at) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-            (turn_id, prompt_role, MODEL, MODEL_KEY, json.dumps(serialized_messages), response,
-             start_time.isoformat(), finish_time.isoformat(), )
+            "INSERT INTO ai_invocations(conversation_turn_id, prompt_role, model, model_key, prompt_messages, system_prompt, response, started_at, finished_at, input_tokens, output_tokens, total_tokens) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            (turn_id, prompt_role, MODEL, MODEL_KEY, json.dumps(serialized_messages), system_prompt, text_response,
+             start_time.isoformat(), finish_time.isoformat(), input_tokens, output_tokens, total_tokens)
         )
 
-    return response
+    return text_response
 
 
 def respond_initial(conn, turn_id: int,
                            request: InvocationRequest):
+
     return invoke_ai(
         conn,
         turn_id,
@@ -123,7 +130,7 @@ def refine(conn, turn_id: int, request: InvocationRequest, critique_response: st
         conn,
         turn_id,
         "refine",
-        system_prompt=get_critique_prompt(critique_response),
+        system_prompt=get_refiner_prompt(request, critique_response),
         messages=request.actor.messages + [
             LLMMessage(
                 role="user",

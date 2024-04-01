@@ -42,6 +42,10 @@ CREATE TABLE IF NOT EXISTS "public".ai_invocations (
     -- One of "initial", "critique", "refine"
     prompt_role VARCHAR NOT NULL,
 
+    input_tokens INTEGER NOT NULL,
+    output_tokens INTEGER NOT NULL,
+    total_tokens INTEGER NOT NULL,
+
     response TEXT NOT NULL,
     started_at TIMESTAMP WITH TIME ZONE NOT NULL,
     finished_at TIMESTAMP WITH TIME ZONE NOT NULL,

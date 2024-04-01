@@ -41,7 +41,7 @@ def store_response(conn, turn_id: int, response: InvocationResponse):
     with conn.cursor() as cur:
         cur.execute(
            "UPDATE conversation_turns SET original_response = %s, critique_response = %s, problems_detected = %s, "
-           "final_response = %s, refined_response = %s, finished_at= %s WHERE turn_id=%s",
+           "final_response = %s, refined_response = %s, finished_at= %s WHERE id=%s",
               (response.original_response, response.critique_response, response.problems_detected, response.final_response,
                 response.refined_response, datetime.now(tz=timezone.utc).isoformat(), turn_id, )
         )
