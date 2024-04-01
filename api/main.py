@@ -27,7 +27,7 @@ def create_conversation_turn(request: InvocationRequest) -> int:
         serialized_chat_messages = [msg.model_dump() for msg in request.actor.messages]
         cur.execute(
             "INSERT INTO conversation_turns (session_id, character_file_version, model, model_key, actor_name, chat_messages) "
-            "VALUES (%s, %s, %s, %s) RETURNING id",
+            "VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
             (request.session_id, request.character_file_version,
              MODEL, MODEL_KEY, request.actor.name, serialized_chat_messages, )
         )

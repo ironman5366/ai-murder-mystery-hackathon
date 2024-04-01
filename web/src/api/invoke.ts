@@ -7,7 +7,11 @@ export interface InvokeParams {
 }
 
 export interface InvokeResponse {
-  response: string;
+  original_response: string;
+  critique_response: string;
+  problems_detected: boolean;
+  final_response: string;
+  refined_response: string;
 }
 
 export default async function invokeAI({

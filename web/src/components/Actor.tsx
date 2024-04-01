@@ -46,7 +46,7 @@ export default function ActorChat({ actor }: Props) {
             ...messages,
             {
               role: "assistant",
-              content: data.response,
+              content: data.final_response,
             },
           ],
         });
