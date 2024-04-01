@@ -6,27 +6,17 @@ from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 import re
 import copy
+import anthropic
+from settings import ANTHROPIC_API_KEY
 
-# get os variables from web/ .env file
-load_dotenv()
 
-verbose = True
-model_type = "anthropic" # mistral / anthropic / openai
+MODEL = "claude-3-haiku-20240307"
 
-if model_type=="mistral":
-    from mistralai.client import MistralClient
-    from mistralai.models.chat_completion import ChatMessage
-    api_key = os.environ['MISTRAL_API_KEY']
-    model = "mistral-large-latest"
-    client = MistralClient(api_key=api_key)
-elif model_type=="anthropic":
-    import anthropic
-    def ChatMessage(role="user",content=""):
-        return {"role": role, "content": content}
-    api_key = os.environ['ANTHROPIC_API_KEY']
-    model = "claude-3-haiku-20240307"
-    client = anthropic.Anthropic(api_key=api_key)
-    anthropic_max_tokens = 512
+# NOTE!! Increment this whenever you change any of the prompts
+PROMPT_VERSION = "1"
+
+client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+anthropic_max_tokens = 512
 
 app = FastAPI()
 
@@ -41,6 +31,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def ChatMessage(role="user", content=""):
+    return {
+        "role": role,
+        "content": content,
+    }
+
 
 class LLMMessage(BaseModel):
     role: str
@@ -67,16 +65,10 @@ class InvocationRequest(BaseModel):
 
 @app.post("/invoke")
 async def root(request: InvocationRequest):
-    if verbose: print("\nREQUEST\n")
-    # if verbose: print(request)
 
-    if model_type=="mistral":
-        raise Exception('Pauls edits are not implemented for Mistral model, just Claude.')
-            
-    elif model_type=="anthropic":
-        system_prompt = request.global_story + " The user is Detective Sheerluck, who aims to find Victim Cho's body and uncover the person responsible for his disappearance. The previous text is the background to this story." + request.actor.prompt()
-        
-        messages = []
+    system_prompt = request.global_story + " The user is Detective Sheerluck, who aims to find Victim Cho's body and uncover the person responsible for his disappearance. The previous text is the background to this story." + request.actor.prompt()
+
+    messages = []
         
     for message in request.actor.messages:
         messages.append(
@@ -87,24 +79,16 @@ async def root(request: InvocationRequest):
         )
     original_user_message = copy.deepcopy(messages[-1])
 
-    if verbose: print(f"\noriginal_user_message: {original_user_message}")
 
-    if verbose: print(f"\n\n __messages__\n {messages}\n\n")
-    
+
     # UNREFINED 
-    
-    if model_type=="mistral":
-        raise Exception('Pauls edits are not implemented for Mistral model, just Claude.')
 
-    elif model_type == "anthropic":
-        unrefined_output = anthropic.Anthropic().messages.create(
-            model=model,
-            system=system_prompt,
-            messages=messages,
-            max_tokens=anthropic_max_tokens,
-        ).content[0].text
-
-    if verbose: print(f"Unrefined: {unrefined_output}")
+    unrefined_output = anthropic.Anthropic().messages.create(
+        model=MODEL,
+        system=system_prompt,
+        messages=messages,
+        max_tokens=anthropic_max_tokens,
+    ).content[0].text
 
     # CRITIQUER
 
@@ -116,10 +100,7 @@ async def root(request: InvocationRequest):
             )
         )
 
-    if verbose: print(f"\n__critique_messages__: {critique_messages}\n")
 
-    if verbose: print(f"\nViolations: {request.actor.violation}\n")
-    
     critique_prompt = f"""
     <instructions> Which of the following disallowed story details (text contained within <disallowed> brackets) are in the input dialogue (the text contained within <dialogue> brackets)? 
     
@@ -135,19 +116,14 @@ async def root(request: InvocationRequest):
     Your response must ONLY detect what is allowed or disallowed. ONLY explain what user inputs are allowed or disallowed and why. 
     </instructions>
     """
-    
-    if model_type=="mistral":
-        raise Exception('Pauls edits are not implemented for Mistral model, just Claude.')
-        
-    elif model_type == "anthropic":
-        critique_chat_response = anthropic.Anthropic().messages.create(
-            model=model,
-            system=critique_prompt,
-            messages=critique_messages,
-            max_tokens=anthropic_max_tokens,
-        ).content[0].text
 
-    if verbose: print(f"\nCritique response: {critique_chat_response}\n")
+    critique_chat_response = anthropic.Anthropic().messages.create(
+        model=MODEL,
+        system=critique_prompt,
+        messages=critique_messages,
+        max_tokens=anthropic_max_tokens,
+    ).content[0].text
+
 
     if "There are no issues!" in critique_chat_response:
         return {
@@ -163,7 +139,6 @@ async def root(request: InvocationRequest):
             )
         )
 
-    if verbose: print(f"\n__refiner_messages___: {refiner_messages}\n")
 
     refined_prompt = f"""
     Your job is to edit conversation for a murder mystery video game. This dialogue comes from the character {request.actor.name} in response to the following prompt: {original_user_message['content']}.
@@ -178,19 +153,14 @@ async def root(request: InvocationRequest):
     """
 
     # print(f"\nrefined_prompt: {refined_prompt}\n")
-    
-    if model_type=="mistral":
-        raise Exception('Pauls edits are not implemented for Mistral model, just Claude.')
-        
-    elif model_type == "anthropic":
-        refined_chat_response = anthropic.Anthropic().messages.create(
-            model=model,
-            system=refined_prompt,
-            messages=refiner_messages,
-            max_tokens=anthropic_max_tokens,
-        ).content[0].text
 
-    if verbose: print(f"\n\n Refined response: {refined_chat_response}")
+    refined_chat_response = anthropic.Anthropic().messages.create(
+        model=MODEL,
+        system=refined_prompt,
+        messages=refiner_messages,
+        max_tokens=anthropic_max_tokens,
+    ).content[0].text
+
 
     # FINAL CHECK
 
@@ -207,16 +177,15 @@ async def root(request: InvocationRequest):
         )
     
     final_check = anthropic.Anthropic().messages.create(
-        model=model,
+        model=MODEL,
         system=final_prompt,
         messages=final_messages,
         max_tokens=anthropic_max_tokens,
     ).content[0].text
 
     if ("assistant" in final_check or "proofread" in final_check or "storyteller" in final_check):
-        if verbose: print(f"\nIMPROPER PROSE DETECTED... {final_check}\n REVERTING REFINEMENT!\n")
         refined_chat_response = unrefined_output
-    if verbose: print(f"\n{final_check}")
+
 
     return {
         "response": refined_chat_response
