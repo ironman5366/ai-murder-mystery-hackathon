@@ -1,5 +1,5 @@
 import React from "react";
-import { AppShell, Grid, Textarea, Title } from "@mantine/core";
+import { AppShell, Burger, Grid, Textarea, Title } from "@mantine/core";
 import Header from "../components/Header";
 import Actors from "../components/Actors";
 import { useDisclosure } from "@mantine/hooks";
@@ -11,9 +11,9 @@ import {
 import ActorSidebar from "../components/ActorSidebar";
 import ActorChat from "../components/Actor";
 export default function Home() {
-  const [opened] = useDisclosure();
   const { actors } = useMysteryContext();
   const [currActor, setCurrActor] = React.useState<number>(0);
+  const [opened, { toggle }] = useDisclosure();
 
   return (
     <AppShell
@@ -26,6 +26,7 @@ export default function Home() {
       padding="md"
     >
       <AppShell.Header>
+        <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
         <Header />
       </AppShell.Header>
       <AppShell.Navbar>

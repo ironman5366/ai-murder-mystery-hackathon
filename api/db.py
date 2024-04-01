@@ -14,4 +14,4 @@ def get_conn():
 def initialize():
     # who needs a migration framework when u have a db.py? not me
     cursor = get_conn().cursor()
-    cursor.execute(SCHEMA_PATH.read_text())
+    # cursor.execute(SCHEMA_PATH.read_text())
