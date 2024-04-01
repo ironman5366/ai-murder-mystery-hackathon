@@ -7,6 +7,8 @@ import {
 import { Button, Group, Loader, Stack, Text, TextInput } from "@mantine/core";
 import invokeAI from "../api/invoke";
 import ActorImage from "./ActorImage";
+import { useSessionContext } from "../providers/sessionContext";
+import CHARACTER_DATA from "../characters.json";
 
 interface Props {
   actor: Actor;
@@ -16,6 +18,7 @@ export default function ActorChat({ actor }: Props) {
   const [currMessage, setCurrMessage] = React.useState("");
   const { setActors, globalStory } = useMysteryContext();
   const [loading, setLoading] = useState(false);
+  const sessionId = useSessionContext();
 
   const setActor = (a: Partial<Actor>) => {
     setActors((all) => {
@@ -36,6 +39,8 @@ export default function ActorChat({ actor }: Props) {
       });
       invokeAI({
         globalStory,
+        sessionId,
+        characterFileVersion: CHARACTER_DATA.fileKey,
         actor: {
           ...actor,
           messages,
@@ -46,7 +51,7 @@ export default function ActorChat({ actor }: Props) {
             ...messages,
             {
               role: "assistant",
-              content: data.response,
+              content: data.final_response,
             },
           ],
         });

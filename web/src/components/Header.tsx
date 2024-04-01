@@ -20,6 +20,13 @@ export default function Header() {
         <Stack>
           <Title>AI Alibis</Title>
           <Title order={3}>Multi-Agent LLM Murder Mystery</Title>
+          <a
+            href={"https://github.com/ironman5366/ai-murder-mystery-hackathon"}
+            target={"_blank"}
+            rel="noreferrer"
+          >
+            github.com/ironman5366/ai-murder-mystery-hackathon
+          </a>
         </Stack>
       </Group>
     </Center>
