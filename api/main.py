@@ -1,10 +1,12 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from types import InvocationRequest, InvocationResponse
-from db import get_conn
+from invoke_types import InvocationRequest, InvocationResponse
+from db import pool
+import json
 from settings import MODEL, MODEL_KEY
 from ai import respond_initial, critique, refine, check_whether_to_refine
+from datetime import datetime, timezone
 
 app = FastAPI()
 
@@ -21,35 +23,42 @@ app.add_middleware(
 )
 
 
-def create_conversation_turn(request: InvocationRequest) -> int:
-    conn = get_conn()
+def create_conversation_turn(conn, request: InvocationRequest) -> int:
     with conn.cursor() as cur:
         serialized_chat_messages = [msg.model_dump() for msg in request.actor.messages]
         cur.execute(
             "INSERT INTO conversation_turns (session_id, character_file_version, model, model_key, actor_name, chat_messages) "
             "VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
             (request.session_id, request.character_file_version,
-             MODEL, MODEL_KEY, request.actor.name, serialized_chat_messages, )
+             MODEL, MODEL_KEY, request.actor.name, json.dumps(serialized_chat_messages), )
         )
-        turn_id = cur.fetchone()
+        turn_id = cur.fetchone()[0]
+
     return turn_id
 
 
-def store_response(turn_id: int, response: InvocationResponse):
-    pass
+def store_response(conn, turn_id: int, response: InvocationResponse):
+    with conn.cursor() as cur:
+        cur.execute(
+           "UPDATE conversation_turns SET original_response = %s, critique_response = %s, problems_detected = %s, "
+           "final_response = %s, refined_response = %s, finished_at= %s WHERE turn_id=%s",
+              (response.original_response, response.critique_response, response.problems_detected, response.final_response,
+                response.refined_response, datetime.now(tz=timezone.utc).isoformat(), turn_id, )
+        )
 
 
-def prompt_ai(request: InvocationRequest) -> InvocationResponse:
-    turn_id = create_conversation_turn(request)
+
+def prompt_ai(conn, request: InvocationRequest) -> InvocationResponse:
+    turn_id = create_conversation_turn(conn, request)
     print(f"Serving turn {turn_id}")
 
     # UNREFINED
-    unrefined_response = respond_initial(turn_id, request)
-    critique_response = critique(turn_id, request, unrefined_response)
+    unrefined_response = respond_initial(conn, turn_id, request)
+    critique_response = critique(conn, turn_id, request, unrefined_response)
     problems_found = check_whether_to_refine(critique_response)
 
     if problems_found:
-        refined_response = refine(turn_id, request, critique_response, unrefined_response)
+        refined_response = refine(conn, turn_id, request, critique_response, unrefined_response)
         final_response = refined_response
     else:
         final_response = unrefined_response
@@ -62,7 +71,8 @@ def prompt_ai(request: InvocationRequest) -> InvocationResponse:
         final_response=final_response,
         refined_response=refined_response,
     )
-    store_response(turn_id, response)
+
+    store_response(conn, turn_id, response)
 
     return response
 
@@ -70,6 +80,7 @@ def prompt_ai(request: InvocationRequest) -> InvocationResponse:
 
 @app.post("/invoke")
 async def invoke(request: InvocationRequest):
-    response = prompt_ai(request)
+    with pool().connection() as conn:
+        response = prompt_ai(conn, request)
 
-    return response.model_dump()
+        return response.model_dump()

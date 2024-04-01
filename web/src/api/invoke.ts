@@ -4,6 +4,8 @@ import { API_URL } from "../constants";
 export interface InvokeParams {
   globalStory: string;
   actor: Actor;
+  sessionId: string;
+  characterFileVersion: string;
 }
 
 export interface InvokeResponse {
@@ -17,12 +19,16 @@ export interface InvokeResponse {
 export default async function invokeAI({
   globalStory,
   actor,
+  sessionId,
+  characterFileVersion,
 }: InvokeParams): Promise<InvokeResponse> {
   const resp = await fetch(`${API_URL}/invoke/`, {
     method: "POST",
     body: JSON.stringify({
       global_story: globalStory,
       actor,
+      session_id: sessionId,
+      character_file_version: characterFileVersion,
     }),
     headers: {
       "Content-Type": "application/json",

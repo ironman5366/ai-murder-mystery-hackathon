@@ -1,8 +1,8 @@
 import time
 from datetime import datetime, timezone
-from types import InvocationRequest, Actor, LLMMessage
-from db import get_conn
+from invoke_types import InvocationRequest, Actor, LLMMessage
 from settings import MODEL, MODEL_KEY, MAX_TOKENS
+import json
 import anthropic
 
 # NOTE: increment PROMPT_VERSION if you make ANY changes to these prompts
@@ -18,16 +18,17 @@ def get_actor_prompt(actor: Actor):
 def get_system_prompt(request: InvocationRequest):
     return request.global_story + (" The user is Detective Sheerluck, who aims to find Victim Cho's body and "
                                    "uncover the person responsible for his disappearance. The previous text is "
-                                   "the background to this story.") + request.actor.prompt()
+                                   "the background to this story.") + get_actor_prompt(request.actor)
 
 
 
 
-def invoke_ai(turn_id: int,
+def invoke_ai(conn,
+              turn_id: int,
               prompt_role: str,
               system_prompt: str,
               messages: list[LLMMessage],):
-    conn = get_conn()
+
     with conn.cursor() as cur:
         start_time = datetime.now(tz=timezone.utc)
         serialized_messages = [msg.model_dump() for msg in messages]
@@ -44,16 +45,17 @@ def invoke_ai(turn_id: int,
         cur.execute(
             "INSERT INTO ai_invocations(conversation_turn_id, prompt_role, model, model_key, prompt_messages, response, started_at, finished_at) "
             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-            turn_id, prompt_role, MODEL, MODEL_KEY, serialized_messages, response, start_time.isoformat(),
-            finish_time.isoformat()
+            (turn_id, prompt_role, MODEL, MODEL_KEY, json.dumps(serialized_messages), response,
+             start_time.isoformat(), finish_time.isoformat(), )
         )
 
     return response
 
 
-def respond_initial(turn_id: int,
+def respond_initial(conn, turn_id: int,
                            request: InvocationRequest):
     return invoke_ai(
+        conn,
         turn_id,
         "initial",
         system_prompt=get_system_prompt(request),
@@ -81,8 +83,9 @@ def get_critique_prompt(
         """
 
 
-def critique(turn_id: int, request: InvocationRequest, unrefined: str) -> str:
+def critique(conn, turn_id: int, request: InvocationRequest, unrefined: str) -> str:
    return invoke_ai(
+       conn,
        turn_id,
        "critique",
        system_prompt=get_critique_prompt(request),
@@ -115,8 +118,9 @@ def get_refiner_prompt(request: InvocationRequest,
         """
 
 
-def refine(turn_id: int, request: InvocationRequest, critique_response: str, unrefined_response: str):
+def refine(conn, turn_id: int, request: InvocationRequest, critique_response: str, unrefined_response: str):
     return invoke_ai(
+        conn,
         turn_id,
         "refine",
         system_prompt=get_critique_prompt(critique_response),

@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS conversation_turns (
+CREATE TABLE IF NOT EXISTS "public".conversation_turns (
     id SERIAL PRIMARY KEY,
 
     -- The UUID that we stick in browser local storage
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS conversation_turns (
 );
 
 
-CREATE TABLE IF NOT EXISTS ai_invocations (
+CREATE TABLE IF NOT EXISTS "public".ai_invocations (
     id SERIAL PRIMARY KEY,
 
     -- Which conversation does this reference?
