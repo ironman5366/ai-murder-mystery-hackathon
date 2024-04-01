@@ -21,7 +21,9 @@ def get_system_prompt(request: InvocationRequest):
                                    "the background to this story.") + request.actor.prompt()
 
 
-def invoke_ai(conversation_id: int,
+
+
+def invoke_ai(turn_id: int,
               prompt_role: str,
               system_prompt: str,
               messages: list[LLMMessage],):
@@ -40,9 +42,89 @@ def invoke_ai(conversation_id: int,
         finish_time = datetime.now(tz=timezone.utc)
 
         cur.execute(
-            "INSERT INTO ai_invocations(conversation_turn_id, model, model_key, prompt_messages, response, started_at, finished_at) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s)",
-            conversation_id, MODEL, MODEL_KEY, serialized_messages, response, start_time.isoformat(), finish_time.isoformat()
+            "INSERT INTO ai_invocations(conversation_turn_id, prompt_role, model, model_key, prompt_messages, response, started_at, finished_at) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+            turn_id, prompt_role, MODEL, MODEL_KEY, serialized_messages, response, start_time.isoformat(),
+            finish_time.isoformat()
         )
 
     return response
+
+
+def respond_initial(turn_id: int,
+                           request: InvocationRequest):
+    return invoke_ai(
+        turn_id,
+        "initial",
+        system_prompt=get_system_prompt(request),
+        messages=request.actor.messages
+    )
+
+
+def get_critique_prompt(
+        request: InvocationRequest
+):
+    return f"""
+        <instructions> Which of the following disallowed story details (text contained within <disallowed> brackets) are in the input dialogue (the text contained within <dialogue> brackets)? 
+
+        User dialogue comes from the {request.actor.name}.
+        Here is background about the story: <story> {request.global_story} </story>
+        And here is background about {request.actor.name}: <character> {request.actor.context} </character> 
+
+        <disallowed> {request.actor.violation} Dialogue not in the POV of {request.actor.name}. </disallowed>
+
+        Exactly what part of {request.actor.name}'s dialogue is incorrect? Your response must be under 30 words. OR if the dialogue is correct without issues, state the exact phrase 'There are no issues!'.
+
+        Explain to me why the dialogue is correct or otherwise provide the specific incorrect part of dialogue and why you think it is incorrect.
+        Your response must ONLY detect what is allowed or disallowed. ONLY explain what user inputs are allowed or disallowed and why. 
+        </instructions>
+        """
+
+
+def critique(turn_id: int, request: InvocationRequest, unrefined: str) -> str:
+   return invoke_ai(
+       turn_id,
+       "critique",
+       system_prompt=get_critique_prompt(request),
+       messages=[LLMMessage(role="user", content=f"<dialogue>{unrefined}</dialogue>")]
+   )
+
+
+def check_whether_to_refine(critique_chat_response: str) -> bool:
+    """
+    Returns a boolean indicating whether the chat response should be refined.
+    """
+    # TODO: make this more sophisticated. Function calling with # of problems, maybe?
+    return "There are no issues!" not in critique_chat_response
+
+
+def get_refiner_prompt(request: InvocationRequest,
+                       critique_response: str):
+    original_message = request.actor.messages[-1].content
+
+    return f"""
+        Your job is to edit conversation for a murder mystery video game. This dialogue comes from the character {request.actor.name} in response to the following prompt: {original_message}.
+
+        Here is story background specific to {request.actor.name}: {request.actor.context} {request.actor.secret}
+
+        Your revised dialogue MUST be less than 60 words long, consistent with the story background, and free of the following problems: {critique_response}.
+
+        Your output revised conversational dialogue must be as identical as possible to the original user message and consistent with the following personality: {request.actor.personality}. Make as few changes as possible to the original input!
+
+        NO QUOTATION MARKS ALLOWED. NO COMMENTARY ON STORY CONSISTENCY OR CRITICISMS.
+        """
+
+
+def refine(turn_id: int, request: InvocationRequest, critique_response: str, unrefined_response: str):
+    return invoke_ai(
+        turn_id,
+        "refine",
+        system_prompt=get_critique_prompt(critique_response),
+        messages=request.actor.messages + [
+            LLMMessage(
+                role="user",
+                content=unrefined_response
+            )
+        ]
+    )
+
