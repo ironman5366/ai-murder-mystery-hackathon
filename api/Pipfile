@@ -9,7 +9,7 @@ uvicorn = {extras = ["standard"], version = "*"}
 mistralai = "*"
 python-dotenv = "*"
 anthropic = "*"
-psycopg = {extras = ["pool"], version = "*"}
+psycopg = {extras = ["pool", "binary"], version = "*"}
 
 [dev-packages]
 

@@ -1,15 +1,18 @@
+import logging
 from functools import cache
 
-import psycopg
-from psycopg.rows import dict_row
 from settings import DB_CONN_URL, SCHEMA_PATH
-from pathlib import Path
 from psycopg_pool import ConnectionPool
 
 
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+)
+logging.getLogger("psycopg.pool").setLevel(logging.INFO)
+
 @cache
 def pool():
-    return ConnectionPool(DB_CONN_URL)
+    return ConnectionPool(DB_CONN_URL, check=ConnectionPool.check_connection)
 
 
 def initialize():
