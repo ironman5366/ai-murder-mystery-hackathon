@@ -1,6 +1,6 @@
 # AI Alibis: Multi-Agent LLM Murder Mystery
 <div align="center">
-<img alt="Ai Alibis Logo" src="https://raw.githubusercontent.com/ironman5366/ai-murder-mystery-hackathon/actually_playable/web/src/assets/screenshot.png" height="400px">
+<img alt="Ai Alibis Logo" src="https://raw.githubusercontent.com/ironman5366/ai-murder-mystery-hackathon/actually_playable/web/src/assets/screenshot.png" max-width="80%">
 </div>
 
 ## Setup
@@ -9,11 +9,16 @@
 git clone https://github.com/ironman5366/ai-murder-mystery-hackathon.git
 cd ai-murder-mystery-hackathon
 ```
-2. Add your Anthropic API to web/.env file
+2. Add your Anthropic API and PostgreSQL DB to api/.env file
 ```
-nano web/.env
-ANTHROPIC_API_KEY="YOUR_API_KEY_HERE"
+nano api/.env
+export ANTHROPIC_API_KEY="YOUR_API_KEY_HERE"
+export DB_CONN_URL="postgresql://link_to_db_conn"
 (<ctrl+x , y, enter> to save changes and exit nano)
+```
+3. Install Node dependencies
+```
+web/npm i
 ```
 3. Start up the api
 ```

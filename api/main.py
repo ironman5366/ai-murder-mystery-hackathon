@@ -24,7 +24,7 @@ app.add_middleware(
 
 
 def create_conversation_turn(conn, request: InvocationRequest) -> int:
-    with conn.cursor() as cur:
+    with conn.cursor() as cur:        
         serialized_chat_messages = [msg.model_dump() for msg in request.actor.messages]
         cur.execute(
             "INSERT INTO conversation_turns (session_id, character_file_version, model, model_key, actor_name, chat_messages) "
@@ -54,11 +54,18 @@ def prompt_ai(conn, request: InvocationRequest) -> InvocationResponse:
 
     # UNREFINED
     unrefined_response = respond_initial(conn, turn_id, request)
+
+    print(f"\nunrefined_response: {unrefined_response}\n")
+
     critique_response = critique(conn, turn_id, request, unrefined_response)
+
+    print(f"\ncritique_response: {critique_response}\n")
+
     problems_found = check_whether_to_refine(critique_response)
 
     if problems_found:
         refined_response = refine(conn, turn_id, request, critique_response, unrefined_response)
+        
         final_response = refined_response
     else:
         final_response = unrefined_response
@@ -72,7 +79,7 @@ def prompt_ai(conn, request: InvocationRequest) -> InvocationResponse:
         refined_response=refined_response,
     )
 
-    store_response(conn, turn_id, response)
+    # store_response(conn, turn_id, response)
 
     return response
 
