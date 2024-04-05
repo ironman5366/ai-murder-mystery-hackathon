@@ -117,8 +117,6 @@ def get_refiner_prompt(request: InvocationRequest,
         NO QUOTATION MARKS OR COMMENTARY ON STORY CONSISTENCY ALLOWED.
         """
 
-    print(f"\nrefine_out: {refine_out}\n")
-
     return refine_out
 
 
