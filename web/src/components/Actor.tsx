@@ -84,7 +84,7 @@ export default function ActorChat({ actor }: Props) {
             border: "1px dotted black",
           }}
         >
-          {m.role === "user" ? "You" : actor.name}: {m.content}
+          {m.role === "user" ? "" : actor.name+":"} {m.content}
         </div>
       ))}
       <Group>
@@ -107,7 +107,7 @@ export default function ActorChat({ actor }: Props) {
               ...actor.messages,
               {
                 role: "user",
-                content: currMessage,
+                content: "Detective Sheerluck: " + currMessage,
               },
             ]);
 

@@ -8,19 +8,16 @@ import anthropic
 # NOTE: increment PROMPT_VERSION if you make ANY changes to these prompts
 
 def get_actor_prompt(actor: Actor):
-    return (f"You are {actor.name} talking to the user, Detective Sheerluck. "
+    return (f"You are {actor.name} talking to Detective Sheerluck. "
             f"All your outputs need to be dialogue responses and must be less than 60 words long. "
-            f"Stay true to the story background, talk in character, and make up vivid story details if unspecified. "
+            f"Stay true to the story background, talk in character, and create your own vivid story details if unspecified. "
+            f"Give elaborate visual descriptions of past events and relationships amongst other people. "
             f"Your personality that should be apparent in all messages is: {actor.personality} "
             f"{actor.context} {actor.secret}")
 
 
 def get_system_prompt(request: InvocationRequest):
-    return request.global_story + (" The user is Detective Sheerluck, who aims to find Victim Cho's body and "
-                                   "uncover the person responsible for his disappearance. The previous text is "
-                                   "the background to this story.") + get_actor_prompt(request.actor)
-
-
+    return request.global_story + (" Detective Sheerluck is interrogating suspects to find Victim Cho's killer. The previous text is the background to this story.") + get_actor_prompt(request.actor)
 
 
 def invoke_ai(conn,
@@ -61,33 +58,32 @@ def invoke_ai(conn,
 def respond_initial(conn, turn_id: int,
                            request: InvocationRequest):
 
+    print(f"\nrequest.actor.messages {request.actor.messages}")
+
     return invoke_ai(
         conn,
         turn_id,
         "initial",
         system_prompt=get_system_prompt(request),
-        messages=request.actor.messages
+        messages=request.actor.messages,
     )
 
 
 def get_critique_prompt(
-        request: InvocationRequest
+        request: InvocationRequest,
+        last_utterance: str
 ):
     return f"""
-        <instructions> Which of the following disallowed story details (text contained within <disallowed> brackets) are in the input dialogue (the text contained within <dialogue> brackets)? 
-
-        User dialogue comes from the {request.actor.name}.
-        Here is background about the story: <story> {request.global_story} </story>
-        And here is background about {request.actor.name}: <character> {request.actor.context} </character> 
-
-        <disallowed> {request.actor.violation} Dialogue not in the POV of {request.actor.name}. </disallowed>
-
-        Exactly what part of {request.actor.name}'s dialogue is incorrect? Your response must be under 30 words. OR if the dialogue is correct without issues, state the exact phrase 'There are no issues!'.
-
-        Explain to me why the dialogue is correct or otherwise provide the specific incorrect part of dialogue and why you think it is incorrect.
-        Your response must ONLY detect what is allowed or disallowed. ONLY explain what user inputs are allowed or disallowed and why. 
-        </instructions>
-        """
+        Examine {request.actor.name}'s last utterance: "{last_utterance}" for severe violations of these principles: Principle A: Talking about being an AI assistant. Principle B: Pretending to be someone other than {request.actor.name}. {request.actor.violation} END OF PRINCIPLES.
+        Focus exclusively on the last utterance and do not consider previous parts of the dialogue. 
+        Identify clear and obvious violations of the preceding principles. Off-topic conversation is allowed.
+        You can ONLY reference the aforementioned principles. Do not focus on anything else. 
+        Provide a concise explanation, quoting directly from the last utterance to illustrate each violation.  
+        Think step by step before listing the principles violated. Return the exact one-word phrase "NONE!" and nothing else if no principles are violated. 
+        Otherwise, after your analysis, you must list the violated principles according to the following format:
+        Format: QUOTE: ... CRITIQUE: ... PRINCIPLES VIOLATED: ...
+        Example of this format: QUOTE: "{request.actor.name} is saying nice things." CRITIQUE: The utterance is in 3rd person perspective. PRINCIPLES VIOLATED: Principle 2: Dialogue not in the POV of {request.actor.name}.
+    """
 
 
 def critique(conn, turn_id: int, request: InvocationRequest, unrefined: str) -> str:
@@ -95,8 +91,8 @@ def critique(conn, turn_id: int, request: InvocationRequest, unrefined: str) -> 
        conn,
        turn_id,
        "critique",
-       system_prompt=get_critique_prompt(request),
-       messages=[LLMMessage(role="user", content=f"<dialogue>{unrefined}</dialogue>")]
+       system_prompt=get_critique_prompt(request,unrefined),
+       messages=[LLMMessage(role="user", content=unrefined)]
    )
 
 
@@ -105,24 +101,23 @@ def check_whether_to_refine(critique_chat_response: str) -> bool:
     Returns a boolean indicating whether the chat response should be refined.
     """
     # TODO: make this more sophisticated. Function calling with # of problems, maybe?
-    return "There are no issues!" not in critique_chat_response
+    return critique_chat_response[:4]!="NONE"
 
 
 def get_refiner_prompt(request: InvocationRequest,
                        critique_response: str):
     original_message = request.actor.messages[-1].content
 
-    return f"""
-        Your job is to edit conversation for a murder mystery video game. This dialogue comes from the character {request.actor.name} in response to the following prompt: {original_message}.
-
-        Here is story background specific to {request.actor.name}: {request.actor.context} {request.actor.secret}
-
-        Your revised dialogue MUST be less than 60 words long, consistent with the story background, and free of the following problems: {critique_response}.
-
-        Your output revised conversational dialogue must be as identical as possible to the original user message and consistent with the following personality: {request.actor.personality}. Make as few changes as possible to the original input!
-
-        NO QUOTATION MARKS ALLOWED. NO COMMENTARY ON STORY CONSISTENCY OR CRITICISMS.
+    refine_out = f"""
+        Your job is to edit conversation for a murder mystery video game. This dialogue comes from the character {request.actor.name} in response to the following prompt: {original_message} 
+        Here is story background for {request.actor.name}: {request.actor.context} {request.actor.secret} 
+        Your revised dialogue MUST be less than 60 words long, consistent with the story background, and free of the following problems: {critique_response}. 
+        Your output revised conversational dialogue must be from {request.actor.name}'s perspective and be as identical as possible to the original user message and consistent with {request.actor.name}'s personality: {request.actor.personality}. 
+        Make as few changes as possible to the original input! 
+        NO QUOTATION MARKS OR COMMENTARY ON STORY CONSISTENCY ALLOWED.
         """
+
+    return refine_out
 
 
 def refine(conn, turn_id: int, request: InvocationRequest, critique_response: str, unrefined_response: str):
@@ -131,10 +126,10 @@ def refine(conn, turn_id: int, request: InvocationRequest, critique_response: st
         turn_id,
         "refine",
         system_prompt=get_refiner_prompt(request, critique_response),
-        messages=request.actor.messages + [
+        messages=[
             LLMMessage(
                 role="user",
-                content=unrefined_response
+                content=unrefined_response,
             )
         ]
     )
