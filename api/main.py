@@ -79,7 +79,7 @@ def prompt_ai(conn, request: InvocationRequest) -> InvocationResponse:
         refined_response=refined_response,
     )
 
-    # store_response(conn, turn_id, response)
+    store_response(conn, turn_id, response)
 
     return response
 
