@@ -1,26 +1,33 @@
-import React from "react";
-import { AppShell, Burger, Grid, Textarea, Title } from "@mantine/core";
-import Header from "../components/Header";
-import Actors from "../components/Actors";
-import { useDisclosure } from "@mantine/hooks";
-import {
-  Actor,
-  INITIAL_CHARACTERS_BY_ID,
-  useMysteryContext,
-} from "../providers/mysteryContext";
-import ActorSidebar from "../components/ActorSidebar";
-import ActorChat from "../components/Actor";
+// src/pages/Home.tsx
+
+import React, { useState } from 'react';
+import { AppShell, Burger, Button } from '@mantine/core';
+import Header from '../components/Header';
+import ActorSidebar from '../components/ActorSidebar';
+import ActorChat from '../components/Actor';
+import IntroModal from '../components/IntroModal';
+import { useDisclosure } from '@mantine/hooks';
+import { useMysteryContext } from '../providers/mysteryContext';
+import MultipleChoiceGame from '../components/MultipleChoiceGame';
+import TextArea from '../components/TextArea';
+
 export default function Home() {
   const { actors } = useMysteryContext();
-  const [currActor, setCurrActor] = React.useState<number>(0);
+  const [currActor, setCurrActor] = useState<number>(0);
   const [opened, { toggle }] = useDisclosure();
+  const [introModalOpened, setIntroModalOpened] = useState(true);
+  const [endGame, setEndGame] = useState(false);
+
+  const handleEndGame = () => {
+    setEndGame(true);
+  };
 
   return (
     <AppShell
-      header={{ height: 200 }}
+      header={{ height: 80 }} // Adjust height to match Header component
       navbar={{
         width: 200,
-        breakpoint: "sm",
+        breakpoint: 'sm',
         collapsed: { mobile: !opened },
       }}
       padding="md"
@@ -33,16 +40,30 @@ export default function Home() {
         <ActorSidebar currentActor={currActor} setCurrentActor={setCurrActor} />
       </AppShell.Navbar>
       <AppShell.Main>
-        <Grid>
-          <Grid.Col span={9}>
-            <ActorChat actor={actors[currActor]} />
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Title order={3}>Your notes</Title>
-            <Textarea></Textarea>
-          </Grid.Col>
-        </Grid>
+        {endGame ? (
+          <MultipleChoiceGame />
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '10px', height: '100%' }}>
+            <div style={{ overflow: 'auto' }}>
+              <ActorChat actor={actors[currActor]} />
+            </div>
+            <TextArea />
+          </div>
+        )}
+        <Button
+          onClick={handleEndGame}
+          size="xs"
+          variant="outline"
+          style={{ marginTop: '20px', alignSelf: 'center' }}
+        >
+          End Game: identify the murderer
+        </Button>
       </AppShell.Main>
+
+      <IntroModal
+        opened={introModalOpened}
+        onClose={() => setIntroModalOpened(false)}
+      />
     </AppShell>
   );
 }
