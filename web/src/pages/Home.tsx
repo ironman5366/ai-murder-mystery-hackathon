@@ -1,7 +1,7 @@
 // src/pages/Home.tsx
 
 import React, { useState } from 'react';
-import { AppShell, Burger, Button } from '@mantine/core';
+import { AppShell, Burger, Button, Textarea } from '@mantine/core';
 import Header from '../components/Header';
 import ActorSidebar from '../components/ActorSidebar';
 import ActorChat from '../components/Actor';
@@ -9,7 +9,6 @@ import IntroModal from '../components/IntroModal';
 import { useDisclosure } from '@mantine/hooks';
 import { useMysteryContext } from '../providers/mysteryContext';
 import MultipleChoiceGame from '../components/MultipleChoiceGame';
-import TextArea from '../components/TextArea';
 
 export default function Home() {
   const { actors } = useMysteryContext();
@@ -40,14 +39,14 @@ export default function Home() {
         <ActorSidebar currentActor={currActor} setCurrentActor={setCurrActor} />
       </AppShell.Navbar>
       <AppShell.Main>
-        {endGame ? (
-          <MultipleChoiceGame />
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '10px', height: '100%' }}>
+        {endGame ? (<MultipleChoiceGame />) : (
+          <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '10px', height: '100%' }}>
             <div style={{ overflow: 'auto' }}>
               <ActorChat actor={actors[currActor]} />
             </div>
-            <TextArea />
+            <div style={{ overflow: 'auto' }}>
+              Notes <Textarea />
+            </div>
           </div>
         )}
         <Button
