@@ -7,22 +7,26 @@ interface Props {
   actor: Actor;
   currentActor: number;
   setCurrentActor: (actor: number) => void;
+  postGame: boolean;
 }
 
 export default function SidebarAvatar({
   actor,
   currentActor,
   setCurrentActor,
+  postGame,
 }: Props) {
   const active = actor.id === currentActor;
 
   return (
     <Group
       onClick={() => {
-        setCurrentActor(actor.id);
+        if (!postGame) {
+          setCurrentActor(actor.id);
+        }
       }}
       style={{
-        cursor: "pointer",
+        cursor: postGame ? "not-allowed" : "pointer",
         backgroundColor: active ? "lightblue" : "transparent",
       }}
     >

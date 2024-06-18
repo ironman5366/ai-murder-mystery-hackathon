@@ -1,19 +1,27 @@
 import React from "react";
-import { Actor, INITIAL_CHARACTERS_BY_ID } from "../providers/mysteryContext";
-import { Stack } from "@mantine/core";
+import { Actor } from "../providers/mysteryContext";
+import { Group, Text } from "@mantine/core";
 import SidebarAvatar from "./SidebarAvatar";
 
 interface Props {
   currentActor: number;
   setCurrentActor: (actor: number) => void;
+  actors: Actor[];
+  postGame: boolean;
 }
 
-export default function ActorSidebar(props: Props) {
+export default function ActorSidebar({ currentActor, setCurrentActor, actors, postGame }: Props) {
   return (
-    <Stack>
-      {Object.values(INITIAL_CHARACTERS_BY_ID).map((a, i) => (
-        <SidebarAvatar actor={a} key={i} {...props} />
+    <div>
+      {actors.map(actor => (
+        <SidebarAvatar
+          key={actor.id}
+          actor={actor}
+          currentActor={currentActor}
+          setCurrentActor={setCurrentActor}
+          postGame={postGame}
+        />
       ))}
-    </Stack>
+    </div>
   );
 }

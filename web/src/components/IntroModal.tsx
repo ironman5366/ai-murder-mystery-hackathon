@@ -26,7 +26,7 @@ const IntroModal: React.FC<IntroModalProps> = ({ opened, onClose }) => {
         3. Take notes and try to solve the mystery.
       </Text>
       <Text mt="sm">
-        4. Once you think you have enough information, make your accusation!
+        4. If on mobile, make sure to click the top-right burger menu to select new people to chat with.
       </Text>
       <Button onClick={onClose} mt="lg">
         Got it, let's play!
