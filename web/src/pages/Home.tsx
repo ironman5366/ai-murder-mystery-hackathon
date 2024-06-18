@@ -1,5 +1,3 @@
-// src/pages/Home.tsx
-
 import React, { useState } from 'react';
 import { AppShell, Burger, Button, Textarea } from '@mantine/core';
 import Header from '../components/Header';
@@ -19,6 +17,10 @@ export default function Home() {
 
   const handleEndGame = () => {
     setEndGame(true);
+  };
+
+  const handleBackToGame = () => {
+    setEndGame(false);
   };
 
   return (
@@ -44,7 +46,10 @@ export default function Home() {
         <ActorSidebar currentActor={currActor} setCurrentActor={setCurrActor} />
       </AppShell.Navbar>
       <AppShell.Main>
-        {endGame ? (<MultipleChoiceGame />) : (
+        {endGame ? (
+          <MultipleChoiceGame onBackToGame={handleBackToGame} />
+        ) : (
+          <div>
           <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '10px', height: '100%' }}>
             <div style={{ overflowY: 'auto', height: '400px' }}>
               <ActorChat actor={actors[currActor]} />
@@ -53,15 +58,16 @@ export default function Home() {
               Notes <Textarea autosize maxRows={12}/>
             </div>
           </div>
+          <Button
+            onClick={handleEndGame}
+            size="xs"
+            variant="outline"
+            style={{ marginTop: '20px', alignSelf: 'center' }}
+          >
+          End Game: identify the murderer
+          </Button>
+          </div>
         )}
-        <Button
-          onClick={handleEndGame}
-          size="xs"
-          variant="outline"
-          style={{ marginTop: '20px', alignSelf: 'center' }}
-        >
-        End Game: identify the murderer
-        </Button>
       </AppShell.Main>
 
       <IntroModal
