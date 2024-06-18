@@ -23,7 +23,7 @@ export default function Home() {
 
   return (
     <AppShell
-      header={{ height: 80 }} // Adjust height to match Header component
+      header={{ height: "100px" }} // Adjust height to match Header component
       navbar={{
         width: 200,
         breakpoint: 'sm',
@@ -32,20 +32,25 @@ export default function Home() {
       padding="md"
     >
       <AppShell.Header>
-        <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+        <Burger style={{
+          position: 'fixed', 
+          top: '20px',
+          left: '10px',
+          zIndex: 1000, 
+        }} opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
         <Header />
       </AppShell.Header>
-      <AppShell.Navbar>
+      <AppShell.Navbar >
         <ActorSidebar currentActor={currActor} setCurrentActor={setCurrActor} />
       </AppShell.Navbar>
       <AppShell.Main>
         {endGame ? (<MultipleChoiceGame />) : (
           <div style={{ display: 'grid', gridTemplateColumns: '3fr 1fr', gap: '10px', height: '100%' }}>
-            <div style={{ overflow: 'auto' }}>
+            <div style={{ overflowY: 'auto', height: '400px' }}>
               <ActorChat actor={actors[currActor]} />
             </div>
-            <div style={{ overflow: 'auto' }}>
-              Notes <Textarea />
+            <div style={{ overflow: 'auto'}}>
+              Notes <Textarea autosize maxRows={12}/>
             </div>
           </div>
         )}
@@ -55,7 +60,7 @@ export default function Home() {
           variant="outline"
           style={{ marginTop: '20px', alignSelf: 'center' }}
         >
-          End Game: identify the murderer
+        End Game: identify the murderer
         </Button>
       </AppShell.Main>
 
