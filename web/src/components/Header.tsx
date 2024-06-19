@@ -1,30 +1,26 @@
 import React from 'react';
-import { Group, Image, Text, Title, Anchor } from '@mantine/core';
+import { Group, Image, Text, Anchor } from '@mantine/core';
 import logo from '../assets/logo.png';
 
-const Header: React.FC = () => {
+export default function Header(){
   return (
     <Group
       align="center"
+      px="md"
+      py="sm"
       style={{
-        padding: '10px 20px',
         backgroundColor: '#f5f5f5',
         borderBottom: '1px solid #e0e0e0',
-        justifyContent: 'space-between',
+        height: '80px',
       }}
     >
-      <Group align="center" style={{ gap: '10px' }}>
-        <Image src={logo} alt="AI Alibis Logo" width={60} height={60} />
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <img src={logo} width="90px" style={{ paddingLeft: '30px', paddingRight: '10px' }} />
         <div>
-          <Title order={2} style={{ marginBottom: 0 }}>AI Alibis</Title>
-          <Text color="dimmed" size="sm">Multi-Agent LLM Murder Mystery</Text>
+          <Text size="lg">AI Alibis</Text>
+          <Text size="12px">Multi-Agent LLM Murder Mystery | <a href="https://github.com/ironman5366/ai-murder-mystery-hackathon">GitHub</a></Text>
         </div>
-      </Group>
-      <Anchor href="https://github.com/ironman5366/ai-murder-mystery-hackathon" target="_blank">
-        github.com/ironman5366/ai-murder-mystery-hackathon
-      </Anchor>
+      </div>
     </Group>
   );
 };
-
-export default Header;
