@@ -18,11 +18,11 @@ const IntroModal: React.FC<IntroModalProps> = ({ opened, onClose }) => {
       </Text>
       <br></br>
       <Text>
-        Deduce the killer by chatting with suspects. They might give you dirt on each other important to solving the case. Beware, every suspect is hiding something.
+        Deduce the killer by chatting with suspects. They probably have some clues about their fellow suspects relevant to solving the case. Beware, every suspect is hiding something.
       </Text>
       <br></br>
       <Text>
-        Your partner Detective Cleo can investigate locations at your request and present you with observational evidence. Ask her to give you an overview of what is currently known about the case.
+        Your partner Officer Cleo can investigate locations at your request and present you with observational evidence. You can ask her to give you an overview of the case or to search certain locations for clues.
       </Text>
       <br></br>
       <Text>
@@ -31,6 +31,10 @@ const IntroModal: React.FC<IntroModalProps> = ({ opened, onClose }) => {
       <br></br>
       <Text>
         If on mobile, make sure to click the top-left burger menu to select new people to chat with.
+      </Text>
+      <br></br>
+      <Text size="xs">
+        To AI savvy players, the suspects' secrets are all in their context windows but we use special violation refinement methods to discourage suspects from spilling the beans! But you might be able to directly get the info you want with some sophisticated prompting...
       </Text>
       <br></br>
       <Button onClick={onClose}>

@@ -14,21 +14,12 @@ export default function Header(){
         height: '80px',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center'}}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img src={logo} width="90px" style={{ paddingLeft: '30px', paddingRight: '10px' }} />
-          <div>
-            <Text size="lg">AI Alibis</Text>
-            <Text size="12px">Multi-Agent LLM Murder Mystery</Text>
-          </div>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <img src={logo} width="90px" style={{ paddingLeft: '30px', paddingRight: '10px' }} />
+        <div>
+          <Text size="lg">AI Alibis</Text>
+          <Text size="12px">Multi-Agent LLM Murder Mystery | <a href="https://github.com/ironman5366/ai-murder-mystery-hackathon">GitHub</a></Text>
         </div>
-        <Anchor 
-          href="https://github.com/ironman5366/ai-murder-mystery-hackathon" 
-          target="_blank" 
-          style={{ fontSize: 'smaller', marginLeft: '50px' }}
-        >
-          github.com/ironman5366/ai-murder-mystery-hackathon
-        </Anchor>
       </div>
     </Group>
   );
