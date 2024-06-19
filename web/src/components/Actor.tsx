@@ -14,12 +14,15 @@ interface Props {
   actor: Actor;
 }
 
-export default function ActorChat({ actor }: Props) {
-  const [currMessage, setCurrMessage] = React.useState("");
-  const { setActors, globalStory } = useMysteryContext();
-  const [loading, setLoading] = useState(false);
-  const sessionId = useSessionContext();
-
+const sendChat = async (
+  messages: LLMMessage[],
+  setActors: (update: (all: Record<number, Actor>) => Record<number, Actor>) => void,
+  globalStory: string,
+  sessionId: string,
+  actor: Actor,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>
+) => {
+  setLoading(true);
   const setActor = (a: Partial<Actor>) => {
     setActors((all) => {
       const newActors = { ...all };
@@ -31,33 +34,44 @@ export default function ActorChat({ actor }: Props) {
     });
   };
 
-  const sendChat = (messages: LLMMessage[]) => {
-    if (!loading) {
-      setLoading(true);
-      setActor({
-        messages,
-      });
-      invokeAI({
-        globalStory,
-        sessionId,
-        characterFileVersion: CHARACTER_DATA.fileKey,
-        actor: {
-          ...actor,
-          messages,
-        },
-      }).then((data) => {
-        setActor({
-          messages: [
-            ...messages,
-            {
-              role: "assistant",
-              content: data.final_response,
-            },
-          ],
-        });
-        setLoading(false);
-      });
-    }
+  setActor({ messages });
+
+  const data = await invokeAI({
+    globalStory,
+    sessionId,
+    characterFileVersion: CHARACTER_DATA.fileKey,
+    actor: {
+      ...actor,
+      messages,
+    },
+  });
+
+  setActor({
+    messages: [
+      ...messages,
+      {
+        role: "assistant",
+        content: data.final_response,
+      },
+    ],
+  });
+  setLoading(false);
+};
+
+const ActorChat = ({ actor }: Props) => {
+  const [currMessage, setCurrMessage] = React.useState("");
+  const { setActors, globalStory } = useMysteryContext();
+  const [loading, setLoading] = useState(false);
+  const sessionId = useSessionContext();
+
+  const handleSendMessage = () => {
+    const newMessage: LLMMessage = {
+      role: "user",
+      content: "Detective Sheerluck: " + currMessage,
+    };
+
+    sendChat([...actor.messages, newMessage], setActors, globalStory, sessionId, actor, setLoading);
+    setCurrMessage("");
   };
 
   return (
@@ -84,7 +98,7 @@ export default function ActorChat({ actor }: Props) {
             border: "1px dotted black",
           }}
         >
-          {m.role === "user" ? "" : actor.name+":"} {m.content}
+          {m.role === "user" ? "" : actor.name + ":"} {m.content}
         </div>
       ))}
       <Group>
@@ -100,23 +114,13 @@ export default function ActorChat({ actor }: Props) {
           />
         )}
 
-        <Button
-          disabled={loading}
-          onClick={() => {
-            sendChat([
-              ...actor.messages,
-              {
-                role: "user",
-                content: "Detective Sheerluck: " + currMessage,
-              },
-            ]);
-
-            setCurrMessage("");
-          }}
-        >
+        <Button disabled={loading} onClick={handleSendMessage}>
           Send
         </Button>
       </Group>
     </Stack>
   );
-}
+};
+
+export { sendChat };
+export default ActorChat;
