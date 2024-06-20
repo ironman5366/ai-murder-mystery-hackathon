@@ -9,7 +9,7 @@ import anthropic
 
 def get_actor_prompt(actor: Actor):
     return (f"You are {actor.name} talking to Detective Sheerluck. "
-            f"All your outputs need to be dialogue responses and must be less than 60 words long. "
+            f"All your outputs need to be dialogue responses and must be less than 80 words long. "
             f"Stay true to the story background, talk in character, and create your own vivid story details if unspecified. "
             f"Give elaborate visual descriptions of past events and relationships amongst other people. "
             f"Your personality that should be apparent in all messages is: {actor.personality} "
@@ -78,7 +78,7 @@ def get_critique_prompt(
         Focus exclusively on the last utterance and do not consider previous parts of the dialogue. 
         Identify clear and obvious violations of the preceding principles. Off-topic conversation is allowed.
         You can ONLY reference the aforementioned principles. Do not focus on anything else. 
-        Provide a concise explanation, quoting directly from the last utterance to illustrate each violation.  
+        Provide a concise less than 100 words explanation, quoting directly from the last utterance to illustrate each violation.  
         Think step by step before listing the principles violated. Return the exact one-word phrase "NONE!" and nothing else if no principles are violated. 
         Otherwise, after your analysis, you must list the violated principles according to the following format:
         Format: QUOTE: ... CRITIQUE: ... PRINCIPLES VIOLATED: ...
@@ -111,10 +111,10 @@ def get_refiner_prompt(request: InvocationRequest,
     refine_out = f"""
         Your job is to edit conversation for a murder mystery video game. This dialogue comes from the character {request.actor.name} in response to the following prompt: {original_message} 
         Here is story background for {request.actor.name}: {request.actor.context} {request.actor.secret} 
-        Your revised dialogue MUST be less than 60 words long, consistent with the story background, and free of the following problems: {critique_response}. 
+        Your revised dialogue MUST be less than 80 words long and consistent with the story background and free of the following problems: {critique_response}.
         Your output revised conversational dialogue must be from {request.actor.name}'s perspective and be as identical as possible to the original user message and consistent with {request.actor.name}'s personality: {request.actor.personality}. 
         Make as few changes as possible to the original input! 
-        NO QUOTATION MARKS OR COMMENTARY ON STORY CONSISTENCY ALLOWED.
+        Quotation marks or commentary on story consistency is prohibited.
         """
 
     return refine_out
