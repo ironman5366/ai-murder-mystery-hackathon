@@ -17,10 +17,11 @@ ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 MODEL = "claude-3-haiku-20240307"
 # MODEL = "claude-3-sonnet-20240229"
 # MODEL = "claude-3-opus-20240229"
+# MODEL = "claude-3-5-sonnet-20240620"
 MAX_TOKENS = 512
 
 # Increment this whenever we make changes to the prompts
-PROMPTS_VERSION = "1.0.1"
+PROMPTS_VERSION = "1.0.3"
 
 MODEL_KEY = f"{MODEL}:{MAX_TOKENS}:{PROMPTS_VERSION}"
 

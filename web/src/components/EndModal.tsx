@@ -14,11 +14,11 @@ const IntroModal: React.FC<IntroModalProps> = ({ opened, onClose }) => {
       title="Thank you for playing AI Alibis!"
     >
       <Text>
-        Let's see if you solved the mystery... 🕵️
+        Let's see if you were right... 🕵️ Detective Sheerluck's deduction is now in your chat interface.
       </Text>
       <br></br>
       <Text>
-        You can now chat with the murderer, who is now configured to answer all your questions honestly. He can tell you what really happened here in the Andae Mountains. Your multiple choice responses have automatically been rewritten as dialogue and submitted as your final deduction.
+        You can now chat with the murderer, who has now been configured to answer all your questions honestly. He can tell you what really happened here in the Andae Mountains. 
       </Text>
       <br></br>
       <Text size="xs">
