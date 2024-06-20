@@ -30,7 +30,7 @@ const IntroModal: React.FC<IntroModalProps> = ({ opened, onClose }) => {
       </Text>
       <br></br>
       <Text>
-        If on mobile, make sure to click the top-left burger menu to select new people to chat with.
+        If playing on a vertical screen, make sure to click the top-left burger menu to select new people to chat with.
       </Text>
       <br></br>
       <Text size="xs">
