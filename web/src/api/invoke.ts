@@ -29,10 +29,11 @@ export default async function invokeAI({
       actor,
       session_id: sessionId,
       character_file_version: characterFileVersion,
-    }),
+    }),    
     headers: {
       "Content-Type": "application/json",
     },
+    mode: "cors",  // Ensure CORS mode is enabled
   });
   return await resp.json();
 }
