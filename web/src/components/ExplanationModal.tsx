@@ -38,7 +38,7 @@ const ExplanationModal: React.FC<ExplanationModalProps> = ({ opened, onClose }) 
       <br></br>
       Despite the chat bots being instructed not to confess to their secrets, we found that suspects often confessed to their deeds during dialogue. We implemented a critique & refinement system (inspired by <Anchor href="https://arxiv.org/abs/2402.07896" target="_blank">this paper</Anchor>) such that every message gets checked against a list of potential violations. If the bot detects a problem, the explanation for this detection along with the original message are sent to a refinement bot to fix the dialogue.
       <br></br><br></br>
-      A paired dataset containing original messages, explanations of their violations, and the subsequent revised messages, could be used to fine-tune the system and improve the overall quality of this murder mystery game. This system is called <Anchor href="https://arxiv.org/abs/2402.07896" target="_blank">Direct Principle Feedback (DPO)</Anchor>.
+      A paired dataset containing original messages, explanations of their violations, and the subsequent revised messages, could be used to fine-tune the system and improve the overall quality of this murder mystery game. This system is called <Anchor href="https://arxiv.org/abs/2402.07896" target="_blank">Direct Principle Feedback</Anchor>.
       <Button onClick={onClose} fullWidth mt="md">
         Close
       </Button>

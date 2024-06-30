@@ -20,10 +20,10 @@ export default function Header() {
       </div>
       <div className={styles.logos}>
         <Anchor href="https://www.synthlabs.ai/" target="_blank">
-          <Image src={synthlabsLogo} alt="SynthLabs Logo" width={50} height={50} />
+          <Image src={synthlabsLogo} alt="SynthLabs Logo" width={40} height={40} />
         </Anchor>
         <Anchor href="https://medarc.ai/" target="_blank">
-          <Image src={medarcLogo} alt="MedArc Logo" width={50} height={50} />
+          <Image src={medarcLogo} alt="MedArc Logo" width={40} height={40} />
         </Anchor>
       </div>
     </div>
