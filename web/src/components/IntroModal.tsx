@@ -11,14 +11,17 @@ const IntroModal: React.FC<IntroModalProps> = ({ opened, onClose }) => {
     <Modal
       opened={opened}
       onClose={onClose}
-      title="**Welcome to AI Alibis**"
+      size="lg"
+      title={
+        <Text size="lg" fw={700}>Welcome to AI Alibis</Text>
+      }
     >
       <Text>
         You are Detective Sheerluck, investigating the murder of Victim Vince.
       </Text>
       <br></br>
       <Text>
-        Deduce the killer by chatting with suspects. They probably have some clues about their fellow suspects relevant to solving the case. Beware, every suspect is hiding something.
+        Deduce the killer by chatting with suspects. The storyline, clues, and suspect alibis are all fixed, and every suspect is hiding someone about the case from the police. However, all these secrets might be uncovered by collecting clues and chatting with all the suspects...
       </Text>
       <br></br>
       <Text>
@@ -27,6 +30,10 @@ const IntroModal: React.FC<IntroModalProps> = ({ opened, onClose }) => {
       <br></br>
       <Text>
         Take notes from your conversations and piece together who killed Victim Vince, why he was killed, and how. When you are ready, click the End Game button to make your deduction.
+      </Text>
+      <br></br>
+      <Text>
+        Click the Learn More button to learn more about our underlying critique & revision system used behind-the-scenes to keep the large language model controlled during inference.
       </Text>
       <br></br>
       <Text>

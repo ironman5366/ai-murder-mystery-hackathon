@@ -33,7 +33,6 @@ export default async function invokeAI({
     headers: {
       "Content-Type": "application/json",
     },
-    mode: "cors",  // Ensure CORS mode is enabled
   });
   return await resp.json();
 }
