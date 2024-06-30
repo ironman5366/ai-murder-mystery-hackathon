@@ -1,7 +1,11 @@
 # AI Alibis: Multi-Agent LLM Murder Mystery
+
+**[Play online](https://ai-murder-mystery.onrender.com)**
 <div align="center">
+<a href="https://ai-murder-mystery.onrender.com/" target="_blank">
 <img alt="Ai Alibis Logo" src="web/src/assets/screenshot.png" max-width="80%">
 </div>
+</a>
 
 ## Setup
 1. Git clone the repo
@@ -29,7 +33,7 @@ bash web_start.sh
 ```
 5. Play the game!
 
-### Additional info
+## Additional info
 
 You can read the full murder story by checking out [web/src/characters.json](https://github.com/ironman5366/ai-murder-mystery-hackathon/blob/main/web/src/characters.json), which contains the full context provided to each character.
 
