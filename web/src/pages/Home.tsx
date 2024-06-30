@@ -5,6 +5,7 @@ import ActorSidebar from '../components/ActorSidebar';
 import ActorChat, { sendChat } from '../components/Actor';
 import IntroModal from '../components/IntroModal';
 import EndModal from '../components/EndModal';
+import ExplanationModal from '../components/ExplanationModal';
 import { useDisclosure } from '@mantine/hooks';
 import { Actor, LLMMessage, useMysteryContext } from '../providers/mysteryContext';
 import { useSessionContext } from '../providers/sessionContext';
@@ -16,6 +17,7 @@ export default function Home() {
   const [opened, { toggle }] = useDisclosure();
   const [introModalOpened, setIntroModalOpened] = useState(true);
   const [endModalOpened, setEndModalOpened] = useState(false);
+  const [explanationModalOpened, setExplanationModalOpened] = useState(false);
   const [endGame, setEndGame] = useState(false);
   const [postGame, setPostGame] = useState(false);
   const [hasEffectRun, setHasEffectRun] = useState(false);
@@ -136,6 +138,9 @@ export default function Home() {
               </div>
             </div>
             <br></br>
+            {(
+              <Button onClick={() => setExplanationModalOpened(true)} style={{margin: '5px' }}>Learn More</Button>
+            )}
             {!postGame && <Button onClick={handleEndGame}>End Game</Button>}
           </div>
         )}
@@ -150,6 +155,11 @@ export default function Home() {
         opened={endModalOpened}
         onClose={() => setEndModalOpened(false)}
       />
+
+      <ExplanationModal
+        opened={explanationModalOpened}
+        onClose={() => setExplanationModalOpened(false)}
+      />    
 
     </AppShell>
   );
