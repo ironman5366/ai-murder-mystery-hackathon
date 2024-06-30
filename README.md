@@ -1,6 +1,6 @@
 # AI Alibis: Multi-Agent LLM Murder Mystery
 <div align="center">
-<img alt="Ai Alibis Logo" src="https://raw.githubusercontent.com/ironman5366/ai-murder-mystery-hackathon/actually_playable/web/src/assets/screenshot.png" max-width="80%">
+<img alt="Ai Alibis Logo" src="web/src/assets/screenshot.png" max-width="80%">
 </div>
 
 ## Setup
