@@ -21,7 +21,7 @@ const IntroModal: React.FC<IntroModalProps> = ({ opened, onClose }) => {
       </Text>
       <br></br>
       <Text>
-        Deduce the killer by chatting with suspects. The storyline, clues, and suspect alibis are all fixed, and every suspect is hiding someone about the case from the police. However, all these secrets might be uncovered by collecting clues and chatting with all the suspects...
+        The storyline, clues, and suspect alibis are all fixed, with every suspect hiding something about the case from the police. Each suspect knows important information about the other suspects, allowing you to piece together the truth through chatting.
       </Text>
       <br></br>
       <Text>
@@ -41,7 +41,7 @@ const IntroModal: React.FC<IntroModalProps> = ({ opened, onClose }) => {
       </Text>
       <br></br>
       <Text size="xs">
-        To AI savvy players, the suspects' secrets are all in their context windows but we use special violation refinement methods to discourage suspects from spilling the beans! But you might be able to directly get the info you want with some sophisticated prompting...
+        To AI savvy players, the suspects' secrets are all in their context windows but we use special critique & refinement methods to discourage suspects from spilling the beans (click Learn More for details). I wonder if perhaps you can directly get the info you want with some sophisticated prompting...
       </Text>
       <br></br>
       <Button onClick={onClose}>

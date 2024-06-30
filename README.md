@@ -9,11 +9,10 @@
 git clone https://github.com/ironman5366/ai-murder-mystery-hackathon.git
 cd ai-murder-mystery-hackathon
 ```
-2. Add your Anthropic API and PostgreSQL DB to api/.env file
+2. Add your Anthropic API to api/.env file (optionally can export conversations to postgres with DB_CONN_URL="postgresql://link_to_db_conn")
 ```
 nano api/.env
 export ANTHROPIC_API_KEY="YOUR_API_KEY_HERE"
-export DB_CONN_URL="postgresql://link_to_db_conn"
 (<ctrl+x , y, enter> to save changes and exit nano)
 ```
 3. Install Node dependencies
@@ -28,4 +27,14 @@ bash api_start.sh
 ```
 bash web_start.sh
 ```
-5. Play the game
+5. Play the game!
+
+### Additional info
+
+You can read the full murder story by checking out [web/src/characters.json](https://github.com/ironman5366/ai-murder-mystery-hackathon/blob/main/web/src/characters.json), which contains the full context provided to each character.
+
+To see how our prompting system works, including our critique and revision approach, check out [api/ai.py](https://github.com/ironman5366/ai-murder-mystery-hackathon/blob/main/api/ai.py).
+
+## Contact
+
+AI Alibis was created by [Paul Scotti](https://paulscotti.github.io/) and [Will Beddow](https://www.willbeddow.com/).
