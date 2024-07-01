@@ -74,6 +74,13 @@ const ActorChat = ({ actor }: Props) => {
     setCurrMessage("");
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      handleSendMessage();
+    }
+  };
+
   return (
     <Stack
       style={{
@@ -111,6 +118,8 @@ const ActorChat = ({ actor }: Props) => {
               setCurrMessage(event.currentTarget.value);
             }}
             value={currMessage}
+            style={{ flexGrow: 1 }}  // Make the text input take available space
+            onKeyPress={handleKeyPress}  // Add key press handler
           />
         )}
 

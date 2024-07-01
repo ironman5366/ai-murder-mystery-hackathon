@@ -6,6 +6,7 @@ import ActorChat, { sendChat } from '../components/Actor';
 import IntroModal from '../components/IntroModal';
 import EndModal from '../components/EndModal';
 import ExplanationModal from '../components/ExplanationModal';
+import SecretsModal from '../components/SecretsModal';
 import { useDisclosure } from '@mantine/hooks';
 import { Actor, LLMMessage, useMysteryContext } from '../providers/mysteryContext';
 import { useSessionContext } from '../providers/sessionContext';
@@ -18,6 +19,7 @@ export default function Home() {
   const [introModalOpened, setIntroModalOpened] = useState(true);
   const [endModalOpened, setEndModalOpened] = useState(false);
   const [explanationModalOpened, setExplanationModalOpened] = useState(false);
+  const [secretsModalOpened, setSecretsModalOpened] = useState(false);
   const [endGame, setEndGame] = useState(false);
   const [postGame, setPostGame] = useState(false);
   const [hasEffectRun, setHasEffectRun] = useState(false);
@@ -141,7 +143,10 @@ export default function Home() {
             {(
               <Button onClick={() => setExplanationModalOpened(true)} style={{margin: '5px' }}>Learn More</Button>
             )}
-            {!postGame && <Button onClick={handleEndGame}>End Game</Button>}
+            {(
+              <Button onClick={() => setSecretsModalOpened(true)} style={{margin: '5px' }}>Spoilers</Button>
+            )}
+            {!postGame && <Button onClick={handleEndGame} style={{margin: '5px' }}>End Game</Button>}
           </div>
         )}
       </AppShell.Main>
@@ -159,7 +164,13 @@ export default function Home() {
       <ExplanationModal
         opened={explanationModalOpened}
         onClose={() => setExplanationModalOpened(false)}
-      />    
+      />   
+
+      <SecretsModal
+        opened={secretsModalOpened}
+        onClose={() => setSecretsModalOpened(false)}
+        postGame={!postGame} 
+      />  
 
     </AppShell>
   );

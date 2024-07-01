@@ -4,8 +4,6 @@ import React from 'react';
 import { Modal, Button, Text, Image, Stack, Group, Anchor } from '@mantine/core';
 import pinkelephants from '../assets/pinkelephants.png';
 import pinkelephants2 from '../assets/pinkelephants2.png';
-import synthlabsLogo from '../assets/synthlabs.png';
-import medarcLogo from '../assets/medarc.png';
 
 interface ExplanationModalProps {
   opened: boolean;
@@ -24,6 +22,8 @@ const ExplanationModal: React.FC<ExplanationModalProps> = ({ opened, onClose }) 
         Created by <Anchor href="https://paulscotti.github.io/" target="_blank">Paul Scotti</Anchor> & <Anchor href="https://www.willbeddow.com/" target="_blank">Will Beddow</Anchor> during a <Anchor href="https://www.synthlabs.ai/" target="_blank">synthlabs.ai</Anchor> hackathon. 
         <br></br>
         Submitted as part of <Anchor href="https://docs.anthropic.com/en/build-with-claude-contest/overview" target="_blank">Anthropic's June Developer Contest</Anchor>.
+        <br></br>
+        Story is modified from the South Korean show <Anchor href="https://en.wikipedia.org/wiki/Crime_Scene_(South_Korean_TV_series)" target="_blank">Crime Scene</Anchor>, S02E11 Mountain Villa Murder.
       </Text>
       <br></br>
       <Text size="lg" fw={700}>Pink elephants refinement system</Text>
@@ -38,7 +38,7 @@ const ExplanationModal: React.FC<ExplanationModalProps> = ({ opened, onClose }) 
       <br></br>
       Despite the chat bots being instructed not to confess to their secrets, we found that suspects often confessed to their deeds during dialogue. We implemented a critique & refinement system (inspired by <Anchor href="https://arxiv.org/abs/2402.07896" target="_blank">this paper</Anchor>) such that every message gets checked against a list of potential violations. If the bot detects a problem, the explanation for this detection along with the original message are sent to a refinement bot to fix the dialogue.
       <br></br><br></br>
-      A paired dataset containing original messages, explanations of their violations, and the subsequent revised messages, could be used to fine-tune the system and improve the overall quality of this murder mystery game. This system is called <Anchor href="https://arxiv.org/abs/2402.07896" target="_blank">Direct Principle Feedback</Anchor>.
+      A paired dataset containing original messages, explanations of their violations, and the subsequent revised messages, could be used to fine-tune the system and improve the overall quality of this murder mystery game. See paper on <Anchor href="https://arxiv.org/abs/2402.07896" target="_blank">Direct Principle Feedback</Anchor>.
       <Button onClick={onClose} fullWidth mt="md">
         Close
       </Button>

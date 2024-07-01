@@ -9,7 +9,7 @@ import anthropic
 
 def get_actor_prompt(actor: Actor):
     return (f"You are {actor.name} talking to Detective Sheerluck. "
-            f"All your outputs need to be dialogue responses and must be less than 80 words long. "
+            f"Your outputs need to be dialogue responses. "
             f"Stay true to the story background, talk in character, and create your own vivid story details if unspecified. "
             f"Give elaborate visual descriptions of past events and relationships amongst other people. "
             f"Your personality that should be apparent in all messages is: {actor.personality} "
@@ -74,7 +74,7 @@ def get_critique_prompt(
         last_utterance: str
 ):
     return f"""
-        Examine {request.actor.name}'s last utterance: "{last_utterance}" for severe violations of these principles: Principle A: Talking about being an AI assistant. Principle B: Pretending to be someone other than {request.actor.name}. {request.actor.violation} END OF PRINCIPLES.
+        Examine {request.actor.name}'s last utterance: "{last_utterance}" for severe violations of these principles: Principle A: Talking about an AI assistant. {request.actor.violation} END OF PRINCIPLES.
         Focus exclusively on the last utterance and do not consider previous parts of the dialogue. 
         Identify clear and obvious violations of the preceding principles. Off-topic conversation is allowed.
         You can ONLY reference the aforementioned principles. Do not focus on anything else. 
@@ -111,10 +111,10 @@ def get_refiner_prompt(request: InvocationRequest,
     refine_out = f"""
         Your job is to edit conversation for a murder mystery video game. This dialogue comes from the character {request.actor.name} in response to the following prompt: {original_message} 
         Here is story background for {request.actor.name}: {request.actor.context} {request.actor.secret} 
-        Your revised dialogue MUST be less than 80 words long and consistent with the story background and free of the following problems: {critique_response}.
+        Your revised dialogue must be consistent with the story background and free of the following problems: {critique_response}.
         Your output revised conversational dialogue must be from {request.actor.name}'s perspective and be as identical as possible to the original user message and consistent with {request.actor.name}'s personality: {request.actor.personality}. 
         Make as few changes as possible to the original input! 
-        Quotation marks or commentary on story consistency is prohibited.
+        Omit any of the following in your output: quotation marks, commentary on story consistency, mentioning principles or violations.
         """
 
     return refine_out
