@@ -25,6 +25,7 @@ export default function Home() {
   const [hasEffectRun, setHasEffectRun] = useState(false);
   const [filteredActors, setFilteredActors] = useState(Object.values(actors));
   const [loading, setLoading] = useState(false);
+  const [notes, setNotes] = useState("");
   const sessionId = useSessionContext();
 
   useEffect(() => {
@@ -136,7 +137,12 @@ export default function Home() {
                 <ActorChat actor={actors[currActor]} />
               </div>
               <div style={{ overflow: 'auto'}}>
-                Notes <Textarea autosize maxRows={12}/>
+                Notes <Textarea
+                  autosize
+                  maxRows={12}
+                  value={notes}
+                  onChange={(event) => setNotes(event.currentTarget.value)}
+                />
               </div>
             </div>
             <br></br>
