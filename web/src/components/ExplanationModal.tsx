@@ -27,7 +27,7 @@ const ExplanationModal: React.FC<ExplanationModalProps> = ({ opened, onClose }) 
       </Text>
       <br></br>
       <Text size="lg" fw={700}>Pink elephants refinement system</Text>
-      A challenging behavior to teach a language models is to avoid mentioning a topic when instructed to do so. A similar concept exists for humans: if instructed "don't think of a pink elephant" we can't help but to do so.
+      A challenging behavior to teach large language models is to avoid mentioning a topic when instructed to do so. A similar concept exists for humans: if instructed "don't think of a pink elephant" we can't help but to do so.
       <br></br>
       <Image src={pinkelephants} alt="Example of pink elephant phenomenon in LLMs" style={{marginLeft: '100 auto'}}/>
       <br></br>
