@@ -7,6 +7,7 @@ import json
 from settings import MODEL, MODEL_KEY
 from ai import respond_initial, critique, refine, check_whether_to_refine
 from datetime import datetime, timezone
+import time
 
 app = FastAPI()
 
@@ -79,7 +80,9 @@ def prompt_ai(conn, request: InvocationRequest) -> InvocationResponse:
         refined_response=refined_response,
     )
 
+    store_start = time.time()
     store_response(conn, turn_id, response)
+    print(f"Stored in {time.time() - store_start:.2f}s")
 
     return response
 
@@ -87,7 +90,12 @@ def prompt_ai(conn, request: InvocationRequest) -> InvocationResponse:
 
 @app.post("/invoke")
 async def invoke(request: InvocationRequest):
+    start_time = time.time()
     with pool().connection() as conn:
+        conn_time = time.time()
+        print(f"Conn in {conn_time - start_time:.2f}s")
         response = prompt_ai(conn, request)
+        response_time = time.time()
+        print(f"Response in {response_time - conn_time:.2f}s")
 
         return response.model_dump()
