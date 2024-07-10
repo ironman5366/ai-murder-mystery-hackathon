@@ -39,6 +39,8 @@ You can read the full murder story by checking out [web/src/characters.json](htt
 
 To see how our prompting system works, including our critique and revision approach, check out [api/ai.py](https://github.com/ironman5366/ai-murder-mystery-hackathon/blob/main/api/ai.py).
 
+Twitter thread on the game: https://x.com/humanscotti/status/1810777932568399933
+
 ## Contact
 
 AI Alibis was created by [Paul Scotti](https://paulscotti.github.io/) and [Will Beddow](https://www.willbeddow.com/).
