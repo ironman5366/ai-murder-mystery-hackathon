@@ -54,9 +54,19 @@ export ANTHROPIC_API_KEY="YOUR_API_KEY_HERE"
 docker compose up
 ```
 
-This should start three containers (the database, Python API, and React frontend).
+This should start three containers (the database, Python API, and React frontend) and create a persistent volume for the database.
 
 4. Play the game at http://localhost:3000/
+
+If you change any files (for example, changing the Anthropic model in `/api/settings.py`), then you will likely need to rebuild the images:
+
+```
+docker compose up --build
+```
+
+5. To shut everything down, hit `CTRL-C` or click the stop button in the Docker GUI. 
+
+To clean up, use the Docker GUI to delete all containers then go to the "Volumes" tab to delete the associated database volume.
 
 ## Additional info
 
