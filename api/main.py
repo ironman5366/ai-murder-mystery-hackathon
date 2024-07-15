@@ -1,5 +1,4 @@
-
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from invoke_types import InvocationRequest, InvocationResponse
 from db import pool
@@ -23,8 +22,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 def create_conversation_turn(conn, request: InvocationRequest) -> int:
+    if conn is None:
+        return 0
+
     with conn.cursor() as cur:        
         serialized_chat_messages = [msg.model_dump() for msg in request.actor.messages]
         cur.execute(
@@ -37,7 +38,6 @@ def create_conversation_turn(conn, request: InvocationRequest) -> int:
 
     return turn_id
 
-
 def store_response(conn, turn_id: int, response: InvocationResponse):
     with conn.cursor() as cur:
         cur.execute(
@@ -46,8 +46,6 @@ def store_response(conn, turn_id: int, response: InvocationResponse):
               (response.original_response, response.critique_response, response.problems_detected, response.final_response,
                 response.refined_response, datetime.now(tz=timezone.utc).isoformat(), turn_id, )
         )
-
-
 
 def prompt_ai(conn, request: InvocationRequest) -> InvocationResponse:
     turn_id = create_conversation_turn(conn, request)
@@ -80,22 +78,25 @@ def prompt_ai(conn, request: InvocationRequest) -> InvocationResponse:
         refined_response=refined_response,
     )
 
-    store_start = time.time()
-    store_response(conn, turn_id, response)
-    print(f"Stored in {time.time() - store_start:.2f}s")
+    if conn is not None:
+        store_start = time.time()
+        store_response(conn, turn_id, response)
+        print(f"Stored in {time.time() - store_start:.2f}s")
 
     return response
-
-
 
 @app.post("/invoke")
 async def invoke(request: InvocationRequest):
     start_time = time.time()
-    with pool().connection() as conn:
-        conn_time = time.time()
-        print(f"Conn in {conn_time - start_time:.2f}s")
-        response = prompt_ai(conn, request)
-        response_time = time.time()
-        print(f"Response in {response_time - conn_time:.2f}s")
+    connection_pool = pool()
+    
+    # Use a mock connection object or None if the pool is not available
+    conn = connection_pool.connection() if connection_pool else None
+    
+    conn_time = time.time()
+    print(f"Conn in {conn_time - start_time:.2f}s")
+    response = prompt_ai(conn, request)
+    response_time = time.time()
+    print(f"Response in {response_time - conn_time:.2f}s")
 
-        return response.model_dump()
+    return response.model_dump()
