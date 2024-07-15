@@ -33,6 +33,31 @@ bash web_start.sh
 ```
 5. Play the game!
 
+## Setup (with Docker)
+
+1. Git clone the repo
+
+```
+git clone https://github.com/ironman5366/ai-murder-mystery-hackathon.git
+cd ai-murder-mystery-hackathon
+```
+
+2. Set environment variables:
+
+```
+export ANTHROPIC_API_KEY="YOUR_API_KEY_HERE"
+```
+
+3. Open a terminal in the folder containing this README, then run:
+
+```
+docker compose up
+```
+
+This should start three containers (the database, Python API, and React frontend).
+
+4. Play the game at http://localhost:3000/
+
 ## Additional info
 
 You can read the full murder story by checking out [web/src/characters.json](https://github.com/ironman5366/ai-murder-mystery-hackathon/blob/main/web/src/characters.json), which contains the full context provided to each character.
