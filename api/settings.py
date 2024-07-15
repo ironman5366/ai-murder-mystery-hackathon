@@ -10,7 +10,8 @@ BASE_DIR = Path(__file__).parent
 
 SCHEMA_PATH = BASE_DIR / "schema.sql"
 
-DB_CONN_URL = os.environ["DB_CONN_URL"]
+# Provide a default value if DB_CONN_URL is not set
+DB_CONN_URL = os.getenv("DB_CONN_URL")
 
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 

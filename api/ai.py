@@ -26,7 +26,34 @@ def invoke_ai(conn,
               system_prompt: str,
               messages: list[LLMMessage],):
 
-    with conn.cursor() as cur:
+    if conn is not None:
+        with conn.cursor() as cur:
+            start_time = datetime.now(tz=timezone.utc)
+            serialized_messages = [msg.model_dump() for msg in messages]
+
+            anthropic_response = anthropic.Anthropic().messages.create(
+                model=MODEL,
+                system=system_prompt,
+                messages=serialized_messages,
+                max_tokens=MAX_TOKENS,
+            )
+
+            input_tokens = anthropic_response.usage.input_tokens
+            output_tokens = anthropic_response.usage.output_tokens
+            total_tokens = input_tokens + output_tokens
+
+            text_response = anthropic_response.content[0].text
+
+            finish_time = datetime.now(tz=timezone.utc)
+
+            cur.execute(
+                "INSERT INTO ai_invocations(conversation_turn_id, prompt_role, model, model_key, input_tokens, output_tokens, total_tokens, start_time, finish_time, response) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (turn_id, prompt_role, MODEL, MODEL_KEY, input_tokens, output_tokens, total_tokens, start_time.isoformat(), finish_time.isoformat(), text_response)
+            )
+
+            conn.commit()
+    else:
         start_time = datetime.now(tz=timezone.utc)
         serialized_messages = [msg.model_dump() for msg in messages]
 
@@ -44,13 +71,6 @@ def invoke_ai(conn,
         text_response = anthropic_response.content[0].text
 
         finish_time = datetime.now(tz=timezone.utc)
-
-        cur.execute(
-            "INSERT INTO ai_invocations(conversation_turn_id, prompt_role, model, model_key, prompt_messages, system_prompt, response, started_at, finished_at, input_tokens, output_tokens, total_tokens) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-            (turn_id, prompt_role, MODEL, MODEL_KEY, json.dumps(serialized_messages), system_prompt, text_response,
-             start_time.isoformat(), finish_time.isoformat(), input_tokens, output_tokens, total_tokens)
-        )
 
     return text_response
 
