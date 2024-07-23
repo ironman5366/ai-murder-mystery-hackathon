@@ -5,6 +5,19 @@ from pathlib import Path
 # get os variables from api/ .env file
 load_dotenv()
 
+# Get configuration from .env file
+INFERENCE_SERVICE = os.getenv('INFERENCE_SERVICE', 'anthropic')  # Default to Anthropic
+
+# Endpoint configuration
+# Groq configuration
+GROQ_API_BASE = "https://api.groq.com/openai/v1"
+
+# OpenRouter configuration
+OPENROUTER_API_BASE = "https://openrouter.ai/api/v1"
+
+# Ollama configuration
+OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434')
+
 BASE_DIR = Path(__file__).parent
 SCHEMA_PATH = BASE_DIR / "schema.sql"
 

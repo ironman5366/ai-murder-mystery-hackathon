@@ -2,31 +2,13 @@ import os
 import time
 from datetime import datetime, timezone
 from invoke_types import InvocationRequest, Actor, LLMMessage
-from settings import MAX_TOKENS, MODEL_KEY, MODEL
+from settings import MODEL, MODEL_KEY, MAX_TOKENS, INFERENCE_SERVICE, API_KEY, OLLAMA_URL, GROQ_API_BASE, OPENROUTER_API_BASE
 import json
 import anthropic
 import openai
 from dotenv import load_dotenv
 import requests
 
-# Load environment variables
-load_dotenv()
-
-# Get configuration from .env file
-INFERENCE_SERVICE = os.getenv('INFERENCE_SERVICE', 'anthropic')  # Default to Anthropic
-MODEL = os.getenv('MODEL', 'claude-3-sonnet-20240229')  # Default model
-API_KEY = os.getenv('API_KEY')
-MAX_TOKENS = int(os.getenv('MAX_TOKENS', MAX_TOKENS))
-
-
-# Groq configuration
-GROQ_API_BASE = "https://api.groq.com/openai/v1"
-
-# OpenRouter configuration
-OPENROUTER_API_BASE = "https://openrouter.ai/api/v1"
-
-# Ollama configuration
-OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434')
 
 # NOTE: increment PROMPT_VERSION if you make ANY changes to these prompts
 
