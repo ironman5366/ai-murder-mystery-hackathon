@@ -2,7 +2,7 @@ import os
 import time
 from datetime import datetime, timezone
 from invoke_types import InvocationRequest, Actor, LLMMessage
-from settings import MAX_TOKENS
+from settings import MAX_TOKENS, MODEL_KEY, MODEL
 import json
 import anthropic
 import openai
@@ -83,7 +83,7 @@ def invoke_ai(conn,
               system_prompt: str,
               messages: list[LLMMessage]):
 
-    start_time = datetime.now(tz=timezone.utc)
+    started_at = datetime.now(timezone.utc)
 
     if INFERENCE_SERVICE == 'anthropic':
         text_response, input_tokens, output_tokens = invoke_anthropic(system_prompt, messages)
@@ -94,16 +94,21 @@ def invoke_ai(conn,
     else:
         raise ValueError(f"Unknown inference service: {INFERENCE_SERVICE}")
 
-    finish_time = datetime.now(tz=timezone.utc)
+    finished_at = datetime.now(timezone.utc)
 
     if conn is not None:
         with conn.cursor() as cur:
             total_tokens = (input_tokens or 0) + (output_tokens or 0)
+            # Convert LLMMessage objects to dictionaries
+            serialized_messages = [msg.model_dump() for msg in messages]
             cur.execute(
-                "INSERT INTO ai_invocations(conversation_turn_id, prompt_role, model, model_key, input_tokens, output_tokens, total_tokens, start_time, finish_time, response) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (turn_id, prompt_role, MODEL, API_KEY, input_tokens, output_tokens, total_tokens, start_time.isoformat(), finish_time.isoformat(), text_response)
-            )
+                "INSERT INTO ai_invocations (conversation_turn_id, model, model_key, prompt_messages, system_prompt, prompt_role, "
+                "input_tokens, output_tokens, total_tokens, response, started_at, finished_at) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (turn_id, MODEL, MODEL_KEY, json.dumps(serialized_messages), system_prompt, prompt_role,
+                 input_tokens, output_tokens, total_tokens,
+                 text_response, started_at, finished_at)
+            )   
             conn.commit()
 
     return text_response

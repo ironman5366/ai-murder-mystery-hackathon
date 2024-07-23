@@ -26,26 +26,36 @@ def create_conversation_turn(conn, request: InvocationRequest) -> int:
     if conn is None:
         return 0
 
-    with conn.cursor() as cur:        
-        serialized_chat_messages = [msg.model_dump() for msg in request.actor.messages]
-        cur.execute(
-            "INSERT INTO conversation_turns (session_id, character_file_version, model, model_key, actor_name, chat_messages) "
-            "VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
-            (request.session_id, request.character_file_version,
-             MODEL, MODEL_KEY, request.actor.name, json.dumps(serialized_chat_messages), )
-        )
-        turn_id = cur.fetchone()[0]
-
-    return turn_id
+    try:
+        with conn.cursor() as cur:        
+            serialized_chat_messages = [msg.model_dump() for msg in request.actor.messages]
+            cur.execute(
+                "INSERT INTO conversation_turns (session_id, character_file_version, model, model_key, actor_name, chat_messages) "
+                "VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
+                (request.session_id, request.character_file_version,
+                 MODEL, MODEL_KEY, request.actor.name, json.dumps(serialized_chat_messages), )
+            )
+            turn_id = cur.fetchone()[0]
+        conn.commit()
+        return turn_id
+    except Exception as e:
+        conn.rollback()
+        print(f"Error in create_conversation_turn: {e}")
+        return 0
 
 def store_response(conn, turn_id: int, response: InvocationResponse):
-    with conn.cursor() as cur:
-        cur.execute(
-           "UPDATE conversation_turns SET original_response = %s, critique_response = %s, problems_detected = %s, "
-           "final_response = %s, refined_response = %s, finished_at= %s WHERE id=%s",
-              (response.original_response, response.critique_response, response.problems_detected, response.final_response,
-                response.refined_response, datetime.now(tz=timezone.utc).isoformat(), turn_id, )
-        )
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+               "UPDATE conversation_turns SET original_response = %s, critique_response = %s, problems_detected = %s, "
+               "final_response = %s, refined_response = %s, finished_at= %s WHERE id=%s",
+                  (response.original_response, response.critique_response, response.problems_detected, response.final_response,
+                    response.refined_response, datetime.now(tz=timezone.utc).isoformat(), turn_id, )
+            )
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        print(f"Error in store_response: {e}")
 
 def prompt_ai(conn, request: InvocationRequest) -> InvocationResponse:
     turn_id = create_conversation_turn(conn, request)
@@ -90,13 +100,18 @@ async def invoke(request: InvocationRequest):
     start_time = time.time()
     connection_pool = pool()
     
-    # Use a mock connection object or None if the pool is not available
-    conn = connection_pool.connection() if connection_pool else None
-    
-    conn_time = time.time()
-    print(f"Conn in {conn_time - start_time:.2f}s")
-    response = prompt_ai(conn, request)
-    response_time = time.time()
-    print(f"Response in {response_time - conn_time:.2f}s")
+    conn = None
+    try:
+        # Use a mock connection object or None if the pool is not available
+        conn = connection_pool.getconn() if connection_pool else None
+        
+        conn_time = time.time()
+        print(f"Conn in {conn_time - start_time:.2f}s")
+        response = prompt_ai(conn, request)
+        response_time = time.time()
+        print(f"Response in {response_time - conn_time:.2f}s")
 
-    return response.model_dump()
+        return response.model_dump()
+    finally:
+        if conn:
+            connection_pool.putconn(conn)
