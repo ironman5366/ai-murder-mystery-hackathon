@@ -10,6 +10,8 @@ mistralai = "*"
 python-dotenv = "*"
 anthropic = "*"
 psycopg = {extras = ["pool", "binary"], version = "*"}
+openai = "*"
+requests = "*"
 
 [dev-packages]
 

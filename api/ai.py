@@ -1,9 +1,32 @@
+import os
 import time
 from datetime import datetime, timezone
 from invoke_types import InvocationRequest, Actor, LLMMessage
-from settings import MODEL, MODEL_KEY, MAX_TOKENS
+from settings import MAX_TOKENS
 import json
 import anthropic
+import openai
+from dotenv import load_dotenv
+import requests
+
+# Load environment variables
+load_dotenv()
+
+# Get configuration from .env file
+INFERENCE_SERVICE = os.getenv('INFERENCE_SERVICE', 'anthropic')  # Default to Anthropic
+MODEL = os.getenv('MODEL', 'claude-3-sonnet-20240229')  # Default model
+API_KEY = os.getenv('API_KEY')
+MAX_TOKENS = int(os.getenv('MAX_TOKENS', MAX_TOKENS))
+
+
+# Groq configuration
+GROQ_API_BASE = "https://api.groq.com/openai/v1"
+
+# OpenRouter configuration
+OPENROUTER_API_BASE = "https://openrouter.ai/api/v1"
+
+# Ollama configuration
+OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434')
 
 # NOTE: increment PROMPT_VERSION if you make ANY changes to these prompts
 
@@ -15,65 +38,75 @@ def get_actor_prompt(actor: Actor):
             f"Your personality that should be apparent in all messages is: {actor.personality} "
             f"{actor.context} {actor.secret}")
 
-
 def get_system_prompt(request: InvocationRequest):
     return request.global_story + (" Detective Sheerluck is interrogating suspects to find Victim Cho's killer. The previous text is the background to this story.") + get_actor_prompt(request.actor)
 
+def invoke_anthropic(system_prompt: str, messages: list[LLMMessage]):
+    client = anthropic.Anthropic(api_key=API_KEY)
+    response = client.messages.create(
+        model=MODEL,
+        system=system_prompt,
+        messages=[msg.model_dump() for msg in messages],
+        max_tokens=MAX_TOKENS,
+    )
+    return response.content[0].text, response.usage.input_tokens, response.usage.output_tokens
+
+def invoke_openai(system_prompt: str, messages: list[LLMMessage]):
+    if INFERENCE_SERVICE == 'groq':
+        client = openai.OpenAI(api_key=API_KEY, base_url=GROQ_API_BASE)
+    elif INFERENCE_SERVICE == 'openrouter':
+        client = openai.OpenAI(api_key=API_KEY, base_url=OPENROUTER_API_BASE)
+    else:  # Default OpenAI
+        client = openai.OpenAI(api_key=API_KEY)
+    
+    response = client.chat.completions.create(
+        model=MODEL,
+        messages=[{"role": "system", "content": system_prompt}] + [msg.model_dump() for msg in messages],
+        max_tokens=MAX_TOKENS,
+    )
+    return response.choices[0].message.content, response.usage.prompt_tokens, response.usage.completion_tokens
+
+def invoke_ollama(system_prompt: str, messages: list[LLMMessage]):
+    prompt = system_prompt + "\n" + "\n".join([f"{msg.role}: {msg.content}" for msg in messages])
+    response = requests.post(f"{OLLAMA_URL}/api/generate", json={
+        "model": MODEL,
+        "prompt": prompt,
+        "stream": False,
+    })
+    response.raise_for_status()
+    result = response.json()
+    return result['response'], None, None  # Ollama doesn't provide token counts
 
 def invoke_ai(conn,
               turn_id: int,
               prompt_role: str,
               system_prompt: str,
-              messages: list[LLMMessage],):
+              messages: list[LLMMessage]):
+
+    start_time = datetime.now(tz=timezone.utc)
+
+    if INFERENCE_SERVICE == 'anthropic':
+        text_response, input_tokens, output_tokens = invoke_anthropic(system_prompt, messages)
+    elif INFERENCE_SERVICE in ['openai', 'groq', 'openrouter']:
+        text_response, input_tokens, output_tokens = invoke_openai(system_prompt, messages)
+    elif INFERENCE_SERVICE == 'ollama':
+        text_response, input_tokens, output_tokens = invoke_ollama(system_prompt, messages)
+    else:
+        raise ValueError(f"Unknown inference service: {INFERENCE_SERVICE}")
+
+    finish_time = datetime.now(tz=timezone.utc)
 
     if conn is not None:
         with conn.cursor() as cur:
-            start_time = datetime.now(tz=timezone.utc)
-            serialized_messages = [msg.model_dump() for msg in messages]
-
-            anthropic_response = anthropic.Anthropic().messages.create(
-                model=MODEL,
-                system=system_prompt,
-                messages=serialized_messages,
-                max_tokens=MAX_TOKENS,
-            )
-
-            input_tokens = anthropic_response.usage.input_tokens
-            output_tokens = anthropic_response.usage.output_tokens
-            total_tokens = input_tokens + output_tokens
-
-            text_response = anthropic_response.content[0].text
-
-            finish_time = datetime.now(tz=timezone.utc)
-
+            total_tokens = (input_tokens or 0) + (output_tokens or 0)
             cur.execute(
                 "INSERT INTO ai_invocations(conversation_turn_id, prompt_role, model, model_key, input_tokens, output_tokens, total_tokens, start_time, finish_time, response) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (turn_id, prompt_role, MODEL, MODEL_KEY, input_tokens, output_tokens, total_tokens, start_time.isoformat(), finish_time.isoformat(), text_response)
+                (turn_id, prompt_role, MODEL, API_KEY, input_tokens, output_tokens, total_tokens, start_time.isoformat(), finish_time.isoformat(), text_response)
             )
-
             conn.commit()
-    else:
-        start_time = datetime.now(tz=timezone.utc)
-        serialized_messages = [msg.model_dump() for msg in messages]
-
-        anthropic_response = anthropic.Anthropic().messages.create(
-            model=MODEL,
-            system=system_prompt,
-            messages=serialized_messages,
-            max_tokens=MAX_TOKENS,
-        )
-
-        input_tokens = anthropic_response.usage.input_tokens
-        output_tokens = anthropic_response.usage.output_tokens
-        total_tokens = input_tokens + output_tokens
-
-        text_response = anthropic_response.content[0].text
-
-        finish_time = datetime.now(tz=timezone.utc)
 
     return text_response
-
 
 def respond_initial(conn, turn_id: int,
                            request: InvocationRequest):
@@ -87,7 +120,6 @@ def respond_initial(conn, turn_id: int,
         system_prompt=get_system_prompt(request),
         messages=request.actor.messages,
     )
-
 
 def get_critique_prompt(
         request: InvocationRequest,
@@ -105,7 +137,6 @@ def get_critique_prompt(
         Example of this format: QUOTE: "{request.actor.name} is saying nice things." CRITIQUE: The utterance is in 3rd person perspective. PRINCIPLES VIOLATED: Principle 2: Dialogue not in the POV of {request.actor.name}.
     """
 
-
 def critique(conn, turn_id: int, request: InvocationRequest, unrefined: str) -> str:
    return invoke_ai(
        conn,
@@ -115,14 +146,12 @@ def critique(conn, turn_id: int, request: InvocationRequest, unrefined: str) -> 
        messages=[LLMMessage(role="user", content=unrefined)]
    )
 
-
 def check_whether_to_refine(critique_chat_response: str) -> bool:
     """
     Returns a boolean indicating whether the chat response should be refined.
     """
     # TODO: make this more sophisticated. Function calling with # of problems, maybe?
     return critique_chat_response[:4]!="NONE"
-
 
 def get_refiner_prompt(request: InvocationRequest,
                        critique_response: str):
@@ -139,7 +168,6 @@ def get_refiner_prompt(request: InvocationRequest,
 
     return refine_out
 
-
 def refine(conn, turn_id: int, request: InvocationRequest, critique_response: str, unrefined_response: str):
     return invoke_ai(
         conn,
@@ -153,4 +181,3 @@ def refine(conn, turn_id: int, request: InvocationRequest, critique_response: st
             )
         ]
     )
-
