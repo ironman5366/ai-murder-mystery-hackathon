@@ -115,3 +115,8 @@ async def invoke(request: InvocationRequest):
     finally:
         if conn:
             connection_pool.putconn(conn)
+
+@app.get("/health")
+async def health_check():
+    # TODO: Implement a better health check mechanism here
+    return {"status": "ok"}
