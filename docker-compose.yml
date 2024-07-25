@@ -35,7 +35,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: ["bash", "api_start.sh"]
 
   frontend:
     build:
@@ -48,7 +47,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: ["bash", "web_start.sh"]
 
 volumes:
   pgdata:
