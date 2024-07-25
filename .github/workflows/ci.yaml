@@ -57,10 +57,14 @@ jobs:
           -e REACT_APP_API_URL \
           frontend
 
-    - name: Wait for services to start
+    - name: Wait for backend service to start
       run: |
-        timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:10000/health)" != "200" ]]; do sleep 5; done'
-   #     timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:3000)" != "200" ]]; do sleep 5; done'
+        timeout 30 bash -c 'while ! docker exec backend curl -s -o /dev/null -w ''%{http_code}'' localhost:10000/health | grep -q 200; do sleep 5; done'
+
+    - name: Wait for frontend service to start
+      run: |
+        timeout 30 bash -c 'while ! docker exec frontend curl -s -o /dev/null -w ''%{http_code}'' localhost:3000 | grep -q 200; do sleep 5; done'
+
 
     # - name: Run tests
     #   run: |
