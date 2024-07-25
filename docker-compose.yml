@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   db:
     image: postgres
@@ -20,10 +22,14 @@ services:
   backend:
     build:
       context: ./api
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
     environment:
       DB_CONN_URL: postgresql://postgres:example@db:5432/postgres
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      INFERENCE_SERVICE: groq # or openai or ollama or openrouter or anthropic
+      MODEL: llama3-8b-8192 # or your preferred model
+      API_KEY: "" # your API key for 
+      MAX_TOKENS: 1000
+      # OLLAMA_URL=http://localhost:11434  # Only needed for Ollama
     ports:
       - "10000:10000"
     depends_on:
@@ -33,9 +39,9 @@ services:
   frontend:
     build:
       context: ./web
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
     environment:
-      REACT_APP_API_URL: backend:10000
+      REACT_APP_API_URL: http://backend:10000
     ports:
       - "3000:3000"
     depends_on:
