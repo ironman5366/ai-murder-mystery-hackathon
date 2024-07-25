@@ -47,7 +47,6 @@ jobs:
         docker run -d --name backend -p 10000:10000 \
           --env-file ./api/.env \
           backend
-        docker exec backend bash api_start.sh
 
     - name: Build and run frontend
       env:
@@ -57,7 +56,6 @@ jobs:
         docker run -d --name frontend -p 3000:3000 \
           -e REACT_APP_API_URL \
           frontend
-        docker exec frontend bash web_start.sh
 
     - name: Wait for services to start
       run: |
