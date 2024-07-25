@@ -20,7 +20,6 @@ RUN pipenv install --deploy --ignore-pipfile
 
 # Copy the rest of the application code
 COPY . /app
-COPY .env /app/.env
 
 # Expose the port FastAPI will run on
 EXPOSE 10000
