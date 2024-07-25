@@ -6,7 +6,6 @@ from settings import MODEL, MODEL_KEY, MAX_TOKENS, INFERENCE_SERVICE, API_KEY, O
 import json
 import anthropic
 import openai
-from dotenv import load_dotenv
 import requests
 
 
