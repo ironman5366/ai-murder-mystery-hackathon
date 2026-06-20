@@ -2,6 +2,7 @@ import React from "react";
 import { Actor } from "../providers/mysteryContext";
 import { Group, Text } from "@mantine/core";
 import ActorImage from "./ActorImage";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   actor: Actor;
@@ -16,6 +17,8 @@ export default function SidebarAvatar({
   setCurrentActor,
   postGame,
 }: Props) {
+  const { t } = useTranslation();
+  const displayName = t(`character${actor.name.replace(/\s+/g, '')}`, { defaultValue: actor.name });
   const active = actor.id === currentActor;
 
   return (
@@ -31,7 +34,7 @@ export default function SidebarAvatar({
       }}
     >
       <ActorImage actor={actor} />
-      <Text>{actor.name}</Text>
+      <Text>{displayName}</Text>
     </Group>
   );
 }

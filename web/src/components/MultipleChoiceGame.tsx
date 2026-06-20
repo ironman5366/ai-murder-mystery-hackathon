@@ -1,55 +1,44 @@
 import React, { useState } from 'react';
 import { Button, Radio, Stack, Title } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 interface MultipleChoiceGameProps {
   onBackToGame: (answers: string[]) => void;
   onResumeGame: () => void;
 }
 
-const questions = [
-  {
-    question: "Who killed Victim Vince? (Question 1/3)",
-    choices: ["Violent Jerry", 
-              "Manager Patricia", 
-              "Solitary Hannah", 
-              "Amateur Larry",
-              "Innocent Kim",
-            ]
-  },
-  {
-    question: "What was the motive for killing Victim Vince? (Question 2/3)",
-    choices: ["Hired to kill from the Bucket Mafia", 
-              "Hired to kill from Manager Patricia",
-              "Getting back stolen treasure", 
-              "Vengeance for the murder of Missing Marcel",
-              "Vengeance for Pwetty Princess",
-            ]
-  },
-  {
-    question: "Who killed Missing Marcel? (Final Question)",
-    choices: ["Violent Jerry", 
-            "Manager Patricia", 
-            "Solitary Hannah", 
-            "Amateur Larry",
-            "Innocent Kim",
-            ],
-  }
+const choiceKeys = [
+  ['choiceViolentJerry', 'choiceManagerPatricia', 'choiceSolitaryHannah', 'choiceAmateurLarry', 'choiceInnocentKim'],
+  ['motiveBucketMafia', 'motiveManagerPatricia', 'motiveStolenTreasure', 'motiveVengeanceMarcel', 'motiveVengeancePrincess'],
+  ['choiceViolentJerry', 'choiceManagerPatricia', 'choiceSolitaryHannah', 'choiceAmateurLarry', 'choiceInnocentKim'],
 ];
 
 const MultipleChoiceGame: React.FC<MultipleChoiceGameProps> = ({ onBackToGame, onResumeGame }) => {
+  const { t } = useTranslation();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [answers, setAnswers] = useState<string[]>([]);
+
+  const questionKeys = ['question1', 'question2', 'question3'];
+
+  const getChoiceValue = (qIndex: number, cIndex: number) => {
+    const values = [
+      ['Violent Jerry', 'Manager Patricia', 'Solitary Hannah', 'Amateur Larry', 'Innocent Kim'],
+      ['Hired to kill from the Bucket Mafia', 'Hired to kill from Manager Patricia', 'Getting back stolen treasure', 'Vengeance for the murder of Missing Marcel', 'Vengeance for Pwetty Princess'],
+      ['Violent Jerry', 'Manager Patricia', 'Solitary Hannah', 'Amateur Larry', 'Innocent Kim'],
+    ];
+    return values[qIndex][cIndex];
+  };
 
   const handleNextQuestion = () => {
     if (selectedChoice !== null) {
       const newAnswers = [...answers, selectedChoice];
       setAnswers(newAnswers);
-      setSelectedChoice(null); // Reset selected choice for next question
-      if (currentQuestionIndex < questions.length - 1) {
+      setSelectedChoice(null);
+      if (currentQuestionIndex < questionKeys.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
-        onBackToGame(newAnswers); // Pass answers back when game is finished
+        onBackToGame(newAnswers);
       }
     }
   };
@@ -60,22 +49,22 @@ const MultipleChoiceGame: React.FC<MultipleChoiceGameProps> = ({ onBackToGame, o
 
   return (
     <div>
-      <Title order={2}>{questions[currentQuestionIndex].question}</Title>
+      <Title order={2}>{t(questionKeys[currentQuestionIndex])}</Title>
       <br></br>
       <Stack>
-        {questions[currentQuestionIndex].choices.map((choice, index) => (
+        {choiceKeys[currentQuestionIndex].map((key, index) => (
           <Radio
             key={index}
-            value={choice}
-            checked={selectedChoice === choice}
+            value={getChoiceValue(currentQuestionIndex, index)}
+            checked={selectedChoice === getChoiceValue(currentQuestionIndex, index)}
             onChange={handleChoiceChange}
-            label={choice}
+            label={t(key)}
           />
         ))}
       </Stack>
       <br></br>
       <Button onClick={handleNextQuestion} disabled={!selectedChoice}>
-        {currentQuestionIndex < questions.length - 1 ? "Next Question" : "Finish"}
+        {currentQuestionIndex < questionKeys.length - 1 ? t('nextQuestion') : t('finish')}
       </Button>
       <br></br>
       <Button
@@ -84,7 +73,7 @@ const MultipleChoiceGame: React.FC<MultipleChoiceGameProps> = ({ onBackToGame, o
         variant="outline"
         style={{ marginTop: '20px', alignSelf: 'center' }}
       >
-        Back
+        {t('back')}
       </Button>
     </div>
   );

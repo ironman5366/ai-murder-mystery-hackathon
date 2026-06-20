@@ -1,28 +1,16 @@
-# Use the official Python image from Docker Hub.
-FROM python:3.12.2-slim
-
-# Set environment variables.
-# Send output straight to terminal (easier debugging).
-# https://stackoverflow.com/a/59812588
-ENV PYTHONUNBUFFERED=1
-
-# Set the working directory
+FROM python:3.14.2-slim AS builder
+ENV PIP_RETRIES=10 PIP_TIMEOUT=120 PYTHONUNBUFFERED=1
 WORKDIR /app
-
-# Install pipenv and ensure it's in the PATH
 RUN pip install --no-cache-dir pipenv
+COPY Pipfile Pipfile.lock ./
+RUN pipenv install --deploy --ignore-pipfile && \
+    pipenv requirements > /requirements.txt
 
-# Copy only the Pipfile and Pipfile.lock
-COPY Pipfile Pipfile.lock /app/
-
-# Install dependencies
-RUN pipenv install --deploy --ignore-pipfile
-
-# Copy the rest of the application code
-COPY . /app
-
-# Expose the port FastAPI will run on
+FROM python:3.14.2-slim
+ENV PYTHONUNBUFFERED=1
+WORKDIR /app
+COPY --from=builder /requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
 EXPOSE 10000
-
-# Define the command to run the application
-CMD ["pipenv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000", "--workers", "8"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000", "--workers", "8"]

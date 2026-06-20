@@ -4,3 +4,9 @@
 **/.idea
 **/venv
 .DS_Store
+node_modules/
+.pytest_cache/
+*.pyc
+.vscode/
+dist/
+build/

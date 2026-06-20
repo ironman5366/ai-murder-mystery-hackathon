@@ -11,8 +11,10 @@ import { useDisclosure } from '@mantine/hooks';
 import { Actor, LLMMessage, useMysteryContext } from '../providers/mysteryContext';
 import { useSessionContext } from '../providers/sessionContext';
 import MultipleChoiceGame from '../components/MultipleChoiceGame';
+import { useTranslation } from 'react-i18next';
 
 export default function Home() {
+  const { t, i18n } = useTranslation();
   const { actors, setActors, globalStory } = useMysteryContext(); 
   const [currActor, setCurrActor] = useState<number>(0);
   const [opened, { toggle }] = useDisclosure();
@@ -102,7 +104,7 @@ export default function Home() {
 
   const forceTextResponseToLarry = (actor: Actor, forcedMessage: string) => {
     const newMessage: LLMMessage = { role: "user", content: forcedMessage };
-    sendChat([...actor.messages, newMessage], setActors, globalStory, sessionId, actor, setLoading);
+    sendChat([...actor.messages, newMessage], setActors, globalStory, sessionId, actor, setLoading, i18n.language);
   };
 
   return (
@@ -137,7 +139,7 @@ export default function Home() {
                 <ActorChat actor={actors[currActor]} />
               </div>
               <div style={{ overflow: 'auto'}}>
-                Notes <Textarea
+                {t('notes')} <Textarea
                   autosize
                   maxRows={12}
                   value={notes}
@@ -147,12 +149,12 @@ export default function Home() {
             </div>
             <br></br>
             {(
-              <Button onClick={() => setExplanationModalOpened(true)} style={{margin: '5px' }}>Learn More</Button>
+              <Button onClick={() => setExplanationModalOpened(true)} style={{margin: '5px' }}>{t('learnMore')}</Button>
             )}
             {(
-              <Button onClick={() => setSecretsModalOpened(true)} style={{margin: '5px' }}>Spoilers</Button>
+              <Button onClick={() => setSecretsModalOpened(true)} style={{margin: '5px' }}>{t('spoilers')}</Button>
             )}
-            {!postGame && <Button onClick={handleEndGame} style={{margin: '5px' }}>End Game</Button>}
+            {!postGame && <Button onClick={handleEndGame} style={{margin: '5px' }}>{t('endGame')}</Button>}
           </div>
         )}
       </AppShell.Main>

@@ -6,6 +6,7 @@ export interface InvokeParams {
   actor: Actor;
   sessionId: string;
   characterFileVersion: string;
+  language?: string;
 }
 
 export interface InvokeResponse {
@@ -21,6 +22,7 @@ export default async function invokeAI({
   actor,
   sessionId,
   characterFileVersion,
+  language = "en",
 }: InvokeParams): Promise<InvokeResponse> {
   const resp = await fetch(`${API_URL}/invoke/`, {
     method: "POST",
@@ -29,6 +31,7 @@ export default async function invokeAI({
       actor,
       session_id: sessionId,
       character_file_version: characterFileVersion,
+      language,
     }),    
     headers: {
       "Content-Type": "application/json",

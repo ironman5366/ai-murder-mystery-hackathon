@@ -2,7 +2,7 @@ import os
 import time
 from datetime import datetime, timezone
 from invoke_types import InvocationRequest, Actor, LLMMessage
-from settings import MODEL, MODEL_KEY, MAX_TOKENS, INFERENCE_SERVICE, API_KEY, OLLAMA_URL, GROQ_API_BASE, OPENROUTER_API_BASE
+from settings import MODEL, MODEL_KEY, MAX_TOKENS, INFERENCE_SERVICE, API_KEY, OLLAMA_URL, GROQ_API_BASE, OPENROUTER_API_BASE, DEEPSEEK_API_BASE
 import json
 import anthropic
 import openai
@@ -20,7 +20,8 @@ def get_actor_prompt(actor: Actor):
             f"{actor.context} {actor.secret}")
 
 def get_system_prompt(request: InvocationRequest):
-    return request.global_story + (" Detective Sheerluck is interrogating suspects to find Victim Cho's killer. The previous text is the background to this story.") + get_actor_prompt(request.actor)
+    lang_instruction = "Respond in English." if request.language == "en" else "请用中文回复。"
+    return lang_instruction + " " + request.global_story + (" Detective Sheerluck is interrogating suspects to find Victim Cho's killer. The previous text is the background to this story.") + get_actor_prompt(request.actor)
 
 def invoke_anthropic(system_prompt: str, messages: list[LLMMessage]):
     client = anthropic.Anthropic(api_key=API_KEY)
@@ -37,6 +38,8 @@ def invoke_openai(system_prompt: str, messages: list[LLMMessage]):
         client = openai.OpenAI(api_key=API_KEY, base_url=GROQ_API_BASE)
     elif INFERENCE_SERVICE == 'openrouter':
         client = openai.OpenAI(api_key=API_KEY, base_url=OPENROUTER_API_BASE)
+    elif INFERENCE_SERVICE == 'deepseek':
+        client = openai.OpenAI(api_key=API_KEY, base_url=DEEPSEEK_API_BASE)
     else:  # Default OpenAI
         client = openai.OpenAI(api_key=API_KEY)
     
@@ -68,7 +71,7 @@ def invoke_ai(conn,
 
     if INFERENCE_SERVICE == 'anthropic':
         text_response, input_tokens, output_tokens = invoke_anthropic(system_prompt, messages)
-    elif INFERENCE_SERVICE in ['openai', 'groq', 'openrouter']:
+    elif INFERENCE_SERVICE in ['openai', 'groq', 'openrouter', 'deepseek']:
         text_response, input_tokens, output_tokens = invoke_openai(system_prompt, messages)
     elif INFERENCE_SERVICE == 'ollama':
         text_response, input_tokens, output_tokens = invoke_ollama(system_prompt, messages)

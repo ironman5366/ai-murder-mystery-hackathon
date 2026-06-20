@@ -20,6 +20,7 @@ class InvocationRequest(BaseModel):
     actor: Actor
     session_id: str
     character_file_version: str
+    language: str = "en"
 
 
 class InvocationResponse(BaseModel):

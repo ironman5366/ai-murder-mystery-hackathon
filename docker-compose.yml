@@ -43,10 +43,10 @@ services:
     environment:
       REACT_APP_API_URL: http://backend:10000
     ports:
-      - "3000:3000"
+      - "3000:80"
     depends_on:
-      db:
-        condition: service_healthy
+      backend:
+        condition: service_started
 
 volumes:
   pgdata:

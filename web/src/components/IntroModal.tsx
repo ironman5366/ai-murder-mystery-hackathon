@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Button, Text } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 interface IntroModalProps {
   opened: boolean;
@@ -7,45 +8,32 @@ interface IntroModalProps {
 }
 
 const IntroModal: React.FC<IntroModalProps> = ({ opened, onClose }) => {
+  const { t } = useTranslation();
   return (
     <Modal
       opened={opened}
       onClose={onClose}
       size="lg"
       title={
-        <Text size="lg" fw={700}>Welcome to AI Alibis</Text>
+        <Text size="lg" fw={700}>{t('welcomeTitle')}</Text>
       }
     >
-      <Text>
-        You are Detective Sheerluck, investigating the murder of Victim Vince.
-      </Text>
+      <Text>{t('introLine1')}</Text>
       <br></br>
-      <Text>
-        The storyline, clues, and suspect alibis are all fixed, with every suspect hiding something about the case from the police. Each suspect knows important information about the other suspects, allowing you to piece together the truth through chatting.
-      </Text>
+      <Text>{t('introLine2')}</Text>
       <br></br>
-      <Text>
-        Your partner Officer Cleo can investigate locations at your request and present you with observational evidence. You can ask her to give you an overview of the case or to search certain locations for clues.
-      </Text>
+      <Text>{t('introLine3')}</Text>
       <br></br>
-      <Text>
-        Take notes from your conversations and piece together who killed Victim Vince, why he was killed, and how. When you are ready, click the End Game button to make your deduction.
-      </Text>
+      <Text>{t('introLine4')}</Text>
       <br></br>
-      <Text>
-        Click the Learn More button to learn more about our underlying critique & revision system used behind-the-scenes to keep the large language model controlled during inference.
-      </Text>
+      <Text>{t('introLine5')}</Text>
       <br></br>
-      <Text>
-        If playing on a small screen, make sure to click the top-left burger menu to select new people to chat with.
-      </Text>
+      <Text>{t('introLine6')}</Text>
       <br></br>
-      <Text size="xs">
-        To AI savvy players, the suspects' secrets are all in their context windows but we use special critique & refinement methods to discourage suspects from spilling the beans (click Learn More for details). I wonder if perhaps you can directly get the info you want with some sophisticated prompting...
-      </Text>
+      <Text size="xs">{t('introLine7')}</Text>
       <br></br>
       <Button onClick={onClose}>
-        Got it, let's play!
+        {t('letsPlay')}
       </Button>
     </Modal>
   );
